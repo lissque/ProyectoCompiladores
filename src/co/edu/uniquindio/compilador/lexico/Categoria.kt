@@ -1,0 +1,5 @@
+package co.edu.uniquindio.compilador.lexico
+
+enum class Categoria {
+    ENTERO, DECIMAL, IDENTIFICADOR, OPERADOR_ARITMETICO, OPERADOR_LOGICO, PARENTESIS_IZQUIERDO, DESCONOCIDO
+}
