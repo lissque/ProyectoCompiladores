@@ -2,6 +2,8 @@ package co.edu.uniquindio.compilador.lexico
 
 class AnalizadorLexico (var codigoFuente:String) {
 
+
+    //ELIMINAR ESTE COMENTARIO, SOLO ES UNA PRUEBA, ADIÓS
     var caracterActual = codigoFuente[0]
     var listaTokens = ArrayList<Token>()
     var posicionActual = 0;
