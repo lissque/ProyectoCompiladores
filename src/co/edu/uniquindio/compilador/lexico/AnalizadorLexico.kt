@@ -14,7 +14,6 @@ class AnalizadorLexico (var codigoFuente:String) {
     fun analizar(){
 
         while (caracterActual != finCodigo){
-            println(caracterActual)
             if (caracterActual==' '||caracterActual=='\t'||caracterActual=='\n'){
                 obtenerSiguienteCaracter()
                 continue
@@ -140,8 +139,10 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (caracterActual == '+' || caracterActual == '-' || caracterActual == '*' || caracterActual == '/'){
                 lexema+= caracterActual
                 almacenarToken(lexema, Categoria.OPERADOR_ARITMETICO,filaIncial,columnaInicial)
+                obtenerSiguienteCaracter()
                 return true
             }
+            hacerBT(posicionInicial,filaIncial,columnaInicial)
             return false
         }
         return false

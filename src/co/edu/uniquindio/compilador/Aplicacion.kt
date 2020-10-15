@@ -4,7 +4,7 @@ import co.edu.uniquindio.compilador.lexico.AnalizadorLexico
 
 fun main()
 {
-    val lexico = AnalizadorLexico("!12345678912!214541")
+    val lexico = AnalizadorLexico("")
     lexico.analizar()
     println(lexico.listaTokens)
 }
