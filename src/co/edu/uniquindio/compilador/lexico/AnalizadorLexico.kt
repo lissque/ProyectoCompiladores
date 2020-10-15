@@ -56,12 +56,8 @@ class AnalizadorLexico (var codigoFuente:String) {
                 }
 
             }
-            if (cont > 11){
                 hacerBT(posicionInicial,filaIncial,columnaInicial)
                 return false
-            }
-
-
         }
 
         return false
