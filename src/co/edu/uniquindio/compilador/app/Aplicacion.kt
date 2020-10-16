@@ -13,6 +13,8 @@ class Aplicacion : Application() {
         val scene = Scene(parent)
         primaryStage?.scene = scene
         primaryStage?.title = "Compilador"
+        //primaryStage?.centerOnScreen()
+        primaryStage?.isResizable = false
         primaryStage?.show()
     }
 

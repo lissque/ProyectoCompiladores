@@ -2,18 +2,24 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="536.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.compilador.controladores.InicioController">
+<AnchorPane prefHeight="606.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.compilador.controladores.InicioController">
    <children>
-      <TextArea fx:id="codigoFuente" layoutX="55.0" layoutY="34.0" prefHeight="237.0" prefWidth="491.0" />
-      <TableView fx:id="tablaTokens" layoutX="55.0" layoutY="336.0" prefHeight="163.0" prefWidth="491.0">
+      <TextArea fx:id="codigoFuente" layoutX="26.0" layoutY="51.0" prefHeight="285.0" prefWidth="550.0" />
+      <TableView fx:id="tablaTokens" layoutX="26.0" layoutY="386.0" prefHeight="193.0" prefWidth="550.0">
         <columns>
-          <TableColumn fx:id="columLexema" prefWidth="224.0" text="Lexema" />
-          <TableColumn fx:id="columCategoria" minWidth="9.0" prefWidth="124.0" text="Categoria" />
-            <TableColumn fx:id="columFila" minWidth="0.0" prefWidth="67.0" text="Fila" />
-            <TableColumn fx:id="columColumna" prefWidth="75.0" text="Columna" />
+          <TableColumn fx:id="columLexema" prefWidth="189.0" text="Lexema" />
+          <TableColumn fx:id="columCategoria" minWidth="9.0" prefWidth="242.0" text="Categoria" />
+            <TableColumn fx:id="columFila" minWidth="0.0" prefWidth="41.0" text="Fila" />
+            <TableColumn fx:id="columColumna" prefWidth="77.0" text="Columna" />
         </columns>
       </TableView>
-      <Button fx:id="btnAnalizar" layoutX="240.0" layoutY="288.0" mnemonicParsing="false" onAction="#analizarCodigo" text="Analizar Codigo" />
+      <Button fx:id="btnAnalizar" layoutX="240.0" layoutY="347.0" mnemonicParsing="false" onAction="#analizarCodigo" text="Analizar Lexico" />
+      <Label layoutX="137.0" layoutY="10.0" prefHeight="39.0" prefWidth="332.0" text="Ingrese el texto a ser analizado:">
+         <font>
+            <Font name="DejaVuMathTeXGyre-Regular" size="20.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
