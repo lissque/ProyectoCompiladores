@@ -604,7 +604,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '|'){
+            while (caracterActual != '|' && caracterActual != finCodigo){
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
@@ -631,7 +631,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '#'){
+            while (caracterActual != '#' && caracterActual != finCodigo){
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
