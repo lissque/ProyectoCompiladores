@@ -100,6 +100,10 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
+            if (caracterActual == '!'){
+                hacerBT(posicionInicial, filaIncial, columnaInicial)
+                return false
+            }
             while (caracterActual.isLetter() || caracterActual == '!' || caracterActual.isDigit()) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
@@ -202,6 +206,8 @@ class AnalizadorLexico (var codigoFuente:String) {
                 almacenarToken(lexema, Categoria.OPERADOR_ARITMETICO, filaIncial, columnaInicial)
                 return true
             }
+            hacerBT(posicionInicial, filaIncial, columnaInicial)
+            return false
         }
         return false
     }
@@ -464,12 +470,12 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '?') {
+            while (caracterActual != '?' && caracterActual != finCodigo) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
 
-            if (caracterActual == '?'){
+            if (caracterActual == '?' ){
                 lexema += caracterActual
                 almacenarToken(lexema, Categoria.AGRUPADORES, filaIncial, columnaInicial)
                 obtenerSiguienteCaracter()
@@ -489,7 +495,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '¬') {
+            while (caracterActual != '¬' && caracterActual != finCodigo) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
@@ -513,7 +519,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '&') {
+            while (caracterActual != '&' && caracterActual != finCodigo) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
