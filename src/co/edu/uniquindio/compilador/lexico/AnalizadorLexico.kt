@@ -1,5 +1,7 @@
 package co.edu.uniquindio.compilador.lexico
 
+import jdk.nashorn.internal.runtime.regexp.joni.EncodingHelper
+
 class AnalizadorLexico (var codigoFuente:String) {
 
 
@@ -32,7 +34,8 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (esOperadorDecremento()) continue
             if (esOperadorRelacional()) continue
             if (esOperadorLogico()) continue
-            if (esAgrupacion()) continue
+            if (esAgrupacionIzquierdo()) continue
+            if (esAgrupacionDerecho()) continue
             if (esFinalSentencia()) continue
             if (esPunto()) continue
             if (esDosPuntos()) continue
@@ -41,6 +44,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (esComentarioBloque()) continue
             if (esCadena()) continue
             if (esCaracter()) continue
+            if (esArreglo()) continue
 
             almacenarToken("" + caracterActual, Categoria.DESCONOCIDO, filaActual, columnaActual)
             obtenerSiguienteCaracter()
@@ -51,19 +55,25 @@ class AnalizadorLexico (var codigoFuente:String) {
     fun almacenarPalabrasReservadas(){
 
         listaPalabrasReservadas.add("vcd")
-        listaPalabrasReservadas.add("ven")
-        listaPalabrasReservadas.add("vre")
+        listaPalabrasReservadas.add("vnum")
         listaPalabrasReservadas.add("v")
-        listaPalabrasReservadas.add("para")
+        listaPalabrasReservadas.add("hacer")
         listaPalabrasReservadas.add("mientras")
-        listaPalabrasReservadas.add("itt")
+        listaPalabrasReservadas.add("mut")
+        listaPalabrasReservadas.add("inm")
         listaPalabrasReservadas.add("si")
         listaPalabrasReservadas.add("dlc")
+        listaPalabrasReservadas.add("imprimir")
+        listaPalabrasReservadas.add("leer")
         listaPalabrasReservadas.add("privado")
         listaPalabrasReservadas.add("publico")
         listaPalabrasReservadas.add("objeto")
         listaPalabrasReservadas.add("retornar")
-
+        listaPalabrasReservadas.add("Inicio")
+        listaPalabrasReservadas.add("Fin")
+        listaPalabrasReservadas.add("noRetorno")
+        listaPalabrasReservadas.add("fun")
+        listaPalabrasReservadas.add("detener")
     }
 
     fun hacerBT(posicionInicial: Int, filaInicial: Int, columnaInicial: Int) {
@@ -91,7 +101,7 @@ class AnalizadorLexico (var codigoFuente:String) {
 
 
     fun esIdentificador(): Boolean {
-        if (caracterActual == '!') {
+        if (caracterActual == '&') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
@@ -100,16 +110,16 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            if (caracterActual == '!'){
+            if (caracterActual == '&'){
                 hacerBT(posicionInicial, filaIncial, columnaInicial)
                 return false
             }
-            while (caracterActual.isLetter() || caracterActual == '!' || caracterActual.isDigit()) {
+            while (caracterActual.isLetter() || caracterActual == '&' || caracterActual.isDigit()) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
                 cont++
 
-                if (lexema[lexema.length - 1] == '!' && cont <= 11) {
+                if (lexema[lexema.length - 1] == '&' && cont <= 11) {
                     lexema = lexema.substring(1, lexema.length - 1)
                     almacenarToken(lexema, Categoria.IDENTIFICADOR, filaIncial, columnaInicial)
                     return true
@@ -139,7 +149,7 @@ class AnalizadorLexico (var codigoFuente:String) {
                 hacerBT(posicionInicial, filaIncial, columnaInicial)
                 return false
             }
-            almacenarToken(lexema, Categoria.ENTERO, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.NUMERICO, filaIncial, columnaInicial)
             return true
         }
         return false
@@ -174,7 +184,7 @@ class AnalizadorLexico (var codigoFuente:String) {
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
-            almacenarToken(lexema, Categoria.DECIMAL, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.NUMERICO, filaIncial, columnaInicial)
             return true
         }
         return false
@@ -423,7 +433,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             hacerBT(posicionInicial,filaIncial,columnaInicial)
             return false
         }
-        if (caracterActual == '[') {
+        if (caracterActual == '¬') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
@@ -431,7 +441,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             var cont = 0
             lexema += caracterActual
             obtenerSiguienteCaracter()
-            if (caracterActual == ']') {
+            if (caracterActual == '¬') {
                 lexema += caracterActual
                 almacenarToken(lexema, Categoria.OPERADOR_LOGICO, filaIncial, columnaInicial)
                 obtenerSiguienteCaracter()
@@ -460,80 +470,53 @@ class AnalizadorLexico (var codigoFuente:String) {
         return false
     }
 
-    fun esAgrupacion(): Boolean {
-
+    fun esAgrupacionIzquierdo(): Boolean {
         if (caracterActual == '¿') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
+            almacenarToken(lexema, Categoria.AGRUPADORIZQ, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
-
-            while (caracterActual != '?' && caracterActual != finCodigo) {
-                lexema += caracterActual
-                obtenerSiguienteCaracter()
-            }
-
-            if (caracterActual == '?' ){
-                lexema += caracterActual
-                almacenarToken(lexema, Categoria.AGRUPADORES, filaIncial, columnaInicial)
-                obtenerSiguienteCaracter()
-                return true
-            }else{
-                hacerBT(posicionInicial, filaIncial, columnaInicial)
-                return false
-            }
-
+            return true
         }
 
-        if (caracterActual == '¬') {
+        if (caracterActual == '¡') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
+            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
-
-            while (caracterActual != '¬' && caracterActual != finCodigo) {
-                lexema += caracterActual
-                obtenerSiguienteCaracter()
-            }
-
-            if (caracterActual == '¬'){
-                lexema += caracterActual
-                almacenarToken(lexema, Categoria.AGRUPADORES, filaIncial, columnaInicial)
-                obtenerSiguienteCaracter()
-                return true
-            }else{
-                hacerBT(posicionInicial, filaIncial, columnaInicial)
-                return false
-            }
-
+            return true
         }
-        if (caracterActual == '&') {
+        return false
+    }
+
+    fun esAgrupacionDerecho(): Boolean {
+
+        if (caracterActual == '?') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
+            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
+            return true
+        }
 
-            while (caracterActual != '&' && caracterActual != finCodigo) {
-                lexema += caracterActual
-                obtenerSiguienteCaracter()
-            }
-
-            if (caracterActual == '&'){
-                lexema += caracterActual
-                almacenarToken(lexema, Categoria.AGRUPADORES, filaIncial, columnaInicial)
-                obtenerSiguienteCaracter()
-                return true
-            }else{
-                hacerBT(posicionInicial, filaIncial, columnaInicial)
-                return false
-            }
-
+        if (caracterActual == '!') {
+            var lexema = ""
+            var filaIncial = filaActual
+            var columnaInicial = columnaActual
+            var posicionInicial = posicionActual
+            lexema += caracterActual
+            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
+            obtenerSiguienteCaracter()
+            return true
         }
         return false
     }
@@ -603,14 +586,11 @@ class AnalizadorLexico (var codigoFuente:String) {
             var posicionInicial = posicionActual
             lexema += caracterActual
             obtenerSiguienteCaracter()
-
-            while (caracterActual != '|' && caracterActual != finCodigo){
-                lexema += caracterActual
-                obtenerSiguienteCaracter()
-            }
             if (caracterActual == '|'){
                 lexema += caracterActual
                 almacenarToken(lexema, Categoria.COMENTARIO_LINEA, filaIncial, columnaInicial)
+                filaActual += 1
+                columnaInicial = 0
                 obtenerSiguienteCaracter()
                 return true
             }else{
@@ -658,7 +638,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             lexema += caracterActual
             obtenerSiguienteCaracter()
 
-            while (caracterActual != '_'){
+            while (caracterActual != '_' && caracterActual != finCodigo){
                 lexema += caracterActual
                 obtenerSiguienteCaracter()
             }
@@ -708,7 +688,30 @@ class AnalizadorLexico (var codigoFuente:String) {
         return false
         }
 
-
+    fun esArreglo():Boolean{
+        if (caracterActual == '['){
+            var lexema = ""
+            var filaIncial = filaActual
+            var columnaInicial = columnaActual
+            var posicionInicial = posicionActual
+            lexema += caracterActual
+            obtenerSiguienteCaracter()
+            while (caracterActual != ']' && caracterActual != finCodigo){
+                lexema += caracterActual
+                obtenerSiguienteCaracter()
+            }
+            if (caracterActual == ']'){
+                lexema += caracterActual
+                almacenarToken(lexema, Categoria.ARREGLO, filaIncial, columnaInicial)
+                obtenerSiguienteCaracter()
+                return true
+            }else{
+                hacerBT(posicionInicial, filaIncial, columnaInicial)
+                return false
+            }
+        }
+        return false
+    }
 
     }
 
