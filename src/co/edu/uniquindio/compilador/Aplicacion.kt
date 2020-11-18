@@ -1,20 +1,16 @@
 package co.edu.uniquindio.compilador
 
 import co.edu.uniquindio.compilador.lexico.AnalizadorLexico
+import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 
 fun main()
 {
-    //val lexico = AnalizadorLexico("::")
-    //lexico.analizar()
-    //println(lexico.listaTokens)
-    var a=0
-    var b=2
-    do {
-        println(a)
-        a++
-        println(a)
-    } while (a<b);
+    val lexico = AnalizadorLexico("fun &Hola& ¿? ; noRetorno ¡123!")
+    lexico.analizar()
+    //print(lexico.listaTokens)
 
-    println(a)
-    println(b)
+    val sintaxis = AnalizadorSintactico(lexico.listaTokens)
+    print(sintaxis.esUnidadDeCompilacion())
+    print(sintaxis.listaErrores)
+
 }

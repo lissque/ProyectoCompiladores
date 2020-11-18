@@ -34,8 +34,12 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (esOperadorDecremento()) continue
             if (esOperadorRelacional()) continue
             if (esOperadorLogico()) continue
-            if (esAgrupacionIzquierdo()) continue
-            if (esAgrupacionDerecho()) continue
+            if (esInterrogacionIzquierdo()) continue
+            if (esInterrogacionDerecho()) continue
+            if (esAdmiracionIzquierdo()) continue
+            if (esAdmiracionDerecho()) continue
+            if (esCorcheteIzquierdo()) continue
+            if (esCorcheteDerecho()) continue
             if (esFinalSentencia()) continue
             if (esPunto()) continue
             if (esDosPuntos()) continue
@@ -44,7 +48,6 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (esComentarioBloque()) continue
             if (esCadena()) continue
             if (esCaracter()) continue
-            if (esArreglo()) continue
 
             almacenarToken("" + caracterActual, Categoria.DESCONOCIDO, filaActual, columnaActual)
             obtenerSiguienteCaracter()
@@ -470,32 +473,36 @@ class AnalizadorLexico (var codigoFuente:String) {
         return false
     }
 
-    fun esAgrupacionIzquierdo(): Boolean {
+    fun esInterrogacionIzquierdo(): Boolean {
         if (caracterActual == '¿') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
-            almacenarToken(lexema, Categoria.AGRUPADORIZQ, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.INTERROGACIONIZQ, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
             return true
         }
+        return false
 
+    }
+
+    fun esAdmiracionIzquierdo(): Boolean{
         if (caracterActual == '¡') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
-            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.ADMIRACIONIZQ, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
             return true
         }
         return false
     }
 
-    fun esAgrupacionDerecho(): Boolean {
+    fun esInterrogacionDerecho(): Boolean {
 
         if (caracterActual == '?') {
             var lexema = ""
@@ -503,18 +510,22 @@ class AnalizadorLexico (var codigoFuente:String) {
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
-            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.INTERROGACIONDER, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
             return true
         }
+        return false
 
+    }
+
+    fun esAdmiracionDerecho(): Boolean{
         if (caracterActual == '!') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
-            almacenarToken(lexema, Categoria.AGRUPADORDER, filaIncial, columnaInicial)
+            almacenarToken(lexema, Categoria.ADMIRACIONDER, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
             return true
         }
@@ -688,30 +699,34 @@ class AnalizadorLexico (var codigoFuente:String) {
         return false
         }
 
-    fun esArreglo():Boolean{
-        if (caracterActual == '['){
+    fun esCorcheteIzquierdo():Boolean{
+        if (caracterActual == '[') {
             var lexema = ""
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
             lexema += caracterActual
+            almacenarToken(lexema, Categoria.CORCHETEIZQ, filaIncial, columnaInicial)
             obtenerSiguienteCaracter()
-            while (caracterActual != ']' && caracterActual != finCodigo){
-                lexema += caracterActual
-                obtenerSiguienteCaracter()
-            }
-            if (caracterActual == ']'){
-                lexema += caracterActual
-                almacenarToken(lexema, Categoria.ARREGLO, filaIncial, columnaInicial)
-                obtenerSiguienteCaracter()
-                return true
-            }else{
-                hacerBT(posicionInicial, filaIncial, columnaInicial)
-                return false
-            }
+            return true
         }
         return false
     }
+
+    fun esCorcheteDerecho():Boolean{
+        if (caracterActual == ']') {
+            var lexema = ""
+            var filaIncial = filaActual
+            var columnaInicial = columnaActual
+            var posicionInicial = posicionActual
+            lexema += caracterActual
+            almacenarToken(lexema, Categoria.CORCHETEDER, filaIncial, columnaInicial)
+            obtenerSiguienteCaracter()
+            return true
+        }
+        return false
+    }
+
 
     }
 
