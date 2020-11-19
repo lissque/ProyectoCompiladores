@@ -1,5 +1,5 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class Lectura {
+class Lectura:Sentencia() {
 
 }

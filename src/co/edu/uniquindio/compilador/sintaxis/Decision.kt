@@ -1,4 +1,4 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class Decision {
+class Decision: Sentencia() {
 }

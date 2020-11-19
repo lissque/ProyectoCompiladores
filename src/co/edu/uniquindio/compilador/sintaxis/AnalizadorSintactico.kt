@@ -194,6 +194,59 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     }
 
     /**
+     * <Expresion> ::= <ExpresionLogica> | <ExpresionAritmetica> | <ExpresionRelacional> | <ExpresionCadena>
+     */
+    fun esExpresion(): Expresion?{
+
+        var expresion:Expresion? = esExpresionLogica()
+
+        if (expresion != null){
+            return expresion
+        }
+        expresion = esExpresionAritmetica()
+        if (expresion != null){
+            return expresion
+        }
+        expresion = esExpresionRelacional()
+        if (expresion != null){
+            return expresion
+        }
+        expresion = esExpresionCadena()
+        return expresion
+
+    }
+
+    /**
+     * <ExpresionAritmetica> ::= <ExpresionAritmetica> operadorAritmetico <ExpresionAritmetica>
+     *  |"¿"<ExpresionAritmetica>"?" | <ValorNumerico>
+     *
+     *  <ExpAritmetica> ::= "¿"<ExpAritmetica>"?" [operadorAritmetico <ExpAritmetica>] |
+    <ValorNumerico> [operadorAritmetico <ExpAritmetica>]
+     */
+    fun esExpresionAritmetica(): ExpresionAritmetica{
+
+        var listaExpresionAritmetica = ArrayList<ValorNumerico>()
+
+        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+            obtenerSiguienteToken()
+            var valorNumerico = esValorNumerico()
+
+            while (valorNumerico != null){
+
+                listaExpresionAritmetica.add(valorNumerico)
+
+                if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO){
+                    obtenerSiguienteToken()
+                    valorNumerico = esValorNumerico()
+                }
+
+            }
+
+
+        }
+    }
+
+    /**
      * <ListaSentencias> ::= <Sentencia>[<ListaSentencias>]
      */
     fun esListaSentencias(): ArrayList<Sentencia>? {
@@ -207,7 +260,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
             if(tokenActual.categoria == Categoria.SEPARADOR){
                 obtenerSiguienteToken()
-                sentencia = esParametro()
+                sentencia = esSentencia()
             }else{
                 //reportarError("Falta el separador")
                 break
@@ -275,10 +328,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             return sentencia
         }
         sentencia = esDetener()
-        if(sentencia != null){
-            return sentencia
-        }
-        return null
+        return sentencia
     }
 
     /**
@@ -295,37 +345,66 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             }
 
         }
-
+        return null
     }
 
+
     /**
-     * <ExpresionAritmetica> ::= <ExpresionAritmetica> operadorAritmetico <ExpresionAritmetica>
-     *  |"¿"<ExpresionAritmetica>"?" | <ValorNumerico>
-     *
-     *  <ExpAritmetica> ::= "¿"<ExpAritmetica>"?" [operadorAritmetico <ExpAritmetica>] |
-        <ValorNumerico> [operadorAritmetico <ExpAritmetica>]
+     * <Incremento> ::= identificador operadorIncremento "/"
      */
-    fun esExpresionAritmetica(): ExpresionAritmetica{
-
-        var listaExpresionAritmetica = ArrayList<ValorNumerico>()
-
-        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+    fun esIncremento(): Incremento?{
+        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+            var nombreVariable = tokenActual
             obtenerSiguienteToken()
-            var valorNumerico = esValorNumerico()
 
-            while (valorNumerico != null){
+            if (tokenActual.categoria == Categoria.OPERADOR_INCREMENTO){
+                obtenerSiguienteToken()
 
-                listaExpresionAritmetica.add(valorNumerico)
-
-                if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO){
-                    obtenerSiguienteToken()
-                    valorNumerico = esValorNumerico()
+                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                    return Incremento(nombreVariable)
                 }
 
             }
-
-
         }
+
+        return null
+    }
+
+    /**
+     * <Decremento> ::= identificador operadorDecremento "/"
+     */
+    fun esDecremento(): Decremento?{
+        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+            var nombreVariable = tokenActual
+            obtenerSiguienteToken()
+
+            if (tokenActual.categoria == Categoria.OPERADOR_DECREMENTO){
+                obtenerSiguienteToken()
+
+                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                    return Decremento(nombreVariable)
+                }
+
+            }
+        }
+
+        return null
+    }
+
+    /**
+     *<Detener> ::= detener "/"
+     */
+    fun esDetener(): Detener?{
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "detener"){
+            var sentenciaDetener = tokenActual
+            obtenerSiguienteToken()
+
+            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                return Detener(sentenciaDetener)
+            }
+        }
+
+        return null
     }
 
     /**
@@ -339,50 +418,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             var numero = tokenActual
             obtenerSiguienteToken()
             return ValorNumerico(signo,numero)
-            }
-
-        return null
-    }
-
-
-
-    /**
-     * <Incremento> ::= identificador operadorIncremento "/"
-     */
-    fun esIncremento(): Token?{
-        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-            var nombreVariable = tokenActual
-            obtenerSiguienteToken()
-
-            if (tokenActual.categoria == Categoria.OPERADOR_INCREMENTO){
-                obtenerSiguienteToken()
-
-                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                    return nombreVariable
-                }
-
-            }
-        }
-
-        return null
-    }
-
-    /**
-     * <Decremento> ::= identificador operadorDecremento "/"
-     */
-    fun esDecremento(): Token?{
-        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-            var nombreVariable = tokenActual
-            obtenerSiguienteToken()
-
-            if (tokenActual.categoria == Categoria.OPERADOR_DECREMENTO){
-                obtenerSiguienteToken()
-
-                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                    return nombreVariable
-                }
-
-            }
         }
 
         return null
@@ -425,21 +460,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         return null
     }
 
-    /**
-     *<Detener> ::= detener "/"
-     */
-    fun esDetener(): Token?{
-        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "detener"){
-            var sentenciaDetener = tokenActual
-            obtenerSiguienteToken()
-
-            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                return sentenciaDetener
-            }
-        }
-
-        return null
-    }
 
     fun reportarError(mensaje:String){
         listaErrores.add( Error(mensaje, tokenActual.fila, tokenActual.columna))
