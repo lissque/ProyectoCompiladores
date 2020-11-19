@@ -5,12 +5,15 @@ import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 
 fun main()
 {
-    val lexico = AnalizadorLexico("fun &Hola& ¿? ; noRetorno ¡123!")
+
+    val lexico = AnalizadorLexico("_hola_@+ 8@+9")
     lexico.analizar()
     //print(lexico.listaTokens)
 
     val sintaxis = AnalizadorSintactico(lexico.listaTokens)
-    print(sintaxis.esUnidadDeCompilacion())
+    print(sintaxis.esExpresionCadena())
     print(sintaxis.listaErrores)
+
+
 
 }
