@@ -358,7 +358,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         var expresionRelacional= esExpresionRelacional()
         if (expresionRelacional!=null){
             listaExpresionLogica.add(""+expresionRelacional)
-            println(tokenActual)
             while (tokenActual.categoria==Categoria.OPERADOR_LOGICO){
                 listaExpresionLogica.add(""+tokenActual)
                 obtenerSiguienteToken()
@@ -452,6 +451,10 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
     }
 
+    /**
+     * <Decision> ::= si "¿" <ExpresionLogica> "?" "¡" <ListaSentencias> "!" [<DeLoContrario>]
+     */
+
     private fun hacerBacktracking(posInicial:Int){
         posicionActual=posInicial
         tokenActual= listaTokens[posicionActual]
@@ -462,23 +465,15 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esListaSentencias(): ArrayList<Sentencia>? {
         var listaSentencias = ArrayList<Sentencia>()
-       // var sentencia = esSentencia()
+        var sentencia = esSentencia()
 
-      /**  while (sentencia != null) {
+       while (sentencia != null) {
 
             listaSentencias.add(sentencia)
             obtenerSiguienteToken()
-
-            if(tokenActual.categoria == Categoria.SEPARADOR){
-                obtenerSiguienteToken()
-                sentencia = esSentencia()
-            }else{
-                //reportarError("Falta el separador")
-                break
-            }
-
+            sentencia=esSentencia()
         }
-      */
+
         if (listaSentencias.size > 0){
             return listaSentencias
         }
@@ -489,12 +484,13 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     /**
      * <Sentencia> ::= <Decision> | <DeclaracionVariables> | <Asignacion> |<CicloMientras> | <Retorno> | <Impresion>
      *  | <Lectura> | <InvocacionFuncion> | <Incremento> | <Decremento> | <DeclaracionArreglo> | <HacerMientras> | <Detener>
-     *
+     */
     fun esSentencia(): Sentencia?{
-        var sentencia:Sentencia? = esSentencia()
+        var sentencia:Sentencia? = esDecision()
         if(sentencia != null){
             return sentencia
         }
+        /**
         sentencia = esDeclaracionVariable()
         if(sentencia != null){
             return sentencia
@@ -523,6 +519,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if(sentencia != null){
             return sentencia
         }
+        */
         sentencia = esIncremento()
         if(sentencia != null){
             return sentencia
@@ -530,7 +527,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         sentencia = esDecremento()
         if(sentencia != null){
             return sentencia
-        }
+        }/**
         sentencia = esDeclaracionArreglo()
         if(sentencia != null){
             return sentencia
@@ -538,24 +535,91 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         sentencia = esHacerMientras()
         if(sentencia != null){
             return sentencia
-        }
+        }*/
         sentencia = esDetener()
         return sentencia
     }
-*/
+
     /**
      * si "¿" <ExpresionLogica> "?" "¡" <ListaSentencias> "!" [<DeLoContrario>]
      */
     fun esDecision(): Decision?{
 
+        var sentenciaDesision=ArrayList<String>()
+
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "si"){
+            sentenciaDesision.add(""+tokenActual)
             obtenerSiguienteToken()
 
             if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+                sentenciaDesision.add(""+tokenActual)
+                obtenerSiguienteToken()
+                var expresionLogica=esExpresionLogica()
+                if(expresionLogica!=null){
+                    sentenciaDesision.add(""+expresionLogica)
+                    if(tokenActual.categoria==Categoria.INTERROGACIONDER){
+                        sentenciaDesision.add(""+tokenActual)
+                        obtenerSiguienteToken()
+                        if (tokenActual.categoria==Categoria.ADMIRACIONIZQ){
+                            var listaSentencias=esListaSentencias()
+                            print(listaSentencias)
+                            if (listaSentencias!=null){
+                                sentenciaDesision.add(""+expresionLogica)
+                                obtenerSiguienteToken()
+                                if(tokenActual.categoria==Categoria.ADMIRACIONDER){
+                                    sentenciaDesision.add(""+expresionLogica)
+                                     return Decision(sentenciaDesision)
 
-                return null
+                                }
+                                var deLoContrario = esDeLoContrario()
+                                if(deLoContrario!=null){
+                                    sentenciaDesision.add(""+deLoContrario)
+                                    obtenerSiguienteToken()
+                                    return Decision(sentenciaDesision)
+
+                                }else{
+                                    return Decision(sentenciaDesision)
+                                }
+                            }
+
+                        }
+                    }
+                }
             }
 
+        }
+        return null
+    }
+
+    /**
+     *
+     *
+    <DeLoContrario> ::= dlc "¡" <ListaSentencias> "!"
+     */
+
+    fun esDeLoContrario():DeLoContrario?{
+        var sentenciaDeLoContrario=ArrayList<String>()
+
+        if (tokenActual.categoria==Categoria.PALABRA_RESERVADA&&tokenActual.lexema=="dlc"){
+            sentenciaDeLoContrario.add(""+tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria==Categoria.ADMIRACIONIZQ){
+                sentenciaDeLoContrario.add(""+tokenActual)
+                obtenerSiguienteToken()
+                var listaSentencia=esListaSentencias()
+                if (listaSentencia!=null){
+                    sentenciaDeLoContrario.add(""+listaSentencia)
+                    obtenerSiguienteToken()
+                    if(tokenActual.categoria==Categoria.ADMIRACIONDER){
+                        sentenciaDeLoContrario.add(""+tokenActual)
+                        return DeLoContrario(sentenciaDeLoContrario)
+                    }else{
+                        return null
+                    }
+
+                }
+
+            }
         }
         return null
     }
