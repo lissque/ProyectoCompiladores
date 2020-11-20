@@ -8,6 +8,7 @@ class AnalizadorLexico (var codigoFuente:String) {
     //ELIMINAR ESTE COMENTARIO, SOLO ES UNA PRUEBA, ADIÓS
     var caracterActual = codigoFuente[0]
     var listaTokens = ArrayList<Token>()
+    var listaErrores = ArrayList<Token>()
     var posicionActual = 0;
     var finCodigo = 0.toChar()
     var filaActual = 0
@@ -16,6 +17,8 @@ class AnalizadorLexico (var codigoFuente:String) {
 
 
     fun almacenarToken(lexema: String, categoria: Categoria, fila: Int, columna: Int) = listaTokens.add(Token(lexema, categoria, fila, columna))
+
+    fun almacenarError(lexema: String, categoria: Categoria, fila: Int, columna: Int) = listaErrores.add(Token(lexema, categoria, fila, columna))
 
     fun analizar() {
         while (caracterActual != finCodigo) {
@@ -48,8 +51,8 @@ class AnalizadorLexico (var codigoFuente:String) {
             if (esComentarioBloque()) continue
             if (esCadena()) continue
             if (esCaracter()) continue
-
-            almacenarToken("" + caracterActual, Categoria.DESCONOCIDO, filaActual, columnaActual)
+            print(""+caracterActual)
+            almacenarError(""+caracterActual, Categoria.DESCONOCIDO, filaActual, columnaActual)
             obtenerSiguienteCaracter()
 
         }
