@@ -41,6 +41,21 @@
                   </AnchorPane>
             </content>
           </Tab>
+            <Tab text="Errores Sintacticos">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <TableView fx:id="tablaErrorSintactico" layoutX="5.0" layoutY="3.0" prefHeight="143.0" prefWidth="408.0">
+                                <columns>
+                                    <TableColumn fx:id="columnaFila" prefWidth="36.0" text="FIL" />
+                                    <TableColumn fx:id="columnaColumna" prefWidth="42.0" text="COL" />
+                                    <TableColumn fx:id="columnaMensaje" prefWidth="329.0" text="MENSAJE" />
+                                </columns>
+                            </TableView>
+                        </children>
+                    </AnchorPane>
+                </content>
+            </Tab>
         </tabs>
       </TabPane>
       <Button layoutX="183.0" layoutY="279.0" mnemonicParsing="false" onAction="#analizarCodigo" text="ANALIZAR" />

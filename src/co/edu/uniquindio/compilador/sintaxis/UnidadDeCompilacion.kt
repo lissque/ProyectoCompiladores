@@ -15,6 +15,14 @@ class UnidadDeCompilacion() {
     fun getArbolVisual(): TreeItem<String>{
         var raiz = TreeItem("Unidad de Compilacion")
 
+        var raizDeclaracionVariable = TreeItem("Variables Globales")
+        if (listaDeclaracionVariable != null){
+            for (d in listaDeclaracionVariable!!){
+                raizDeclaracionVariable.children.add(d.getArbolVisual())
+            }
+            raiz.children.add(raizDeclaracionVariable)
+        }
+
         if (listaFunciones!= null){
             for (f in listaFunciones!!){
                 raiz.children.add(f.getArbolVisual())

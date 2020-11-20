@@ -4,6 +4,7 @@ import co.edu.uniquindio.compilador.lexico.AnalizadorLexico
 import co.edu.uniquindio.compilador.lexico.Categoria
 import co.edu.uniquindio.compilador.lexico.Token
 import co.edu.uniquindio.compilador.observable.ErrorObservable
+import co.edu.uniquindio.compilador.observable.ErrorSintacticoObservable
 import co.edu.uniquindio.compilador.observable.TokenObservable
 import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 import javafx.event.ActionEvent
@@ -40,6 +41,15 @@ class InicioController {
     lateinit var colColumna: TableColumn<ErrorObservable, String>
 
     @FXML
+    lateinit var tablaErrorSintactico: TableView<ErrorSintacticoObservable>
+    @FXML
+    lateinit var columnaMensaje: TableColumn<ErrorSintacticoObservable, String>
+    @FXML
+    lateinit var columnaFila: TableColumn<ErrorSintacticoObservable, String>
+    @FXML
+    lateinit var columnaColumna: TableColumn<ErrorSintacticoObservable, String>
+
+    @FXML
     lateinit var arbolVisual : TreeView<String>
 
     @FXML
@@ -47,6 +57,7 @@ class InicioController {
         if (codigoFuente.length>0){
             iniciarTablaTokens()
             iniciarTablaErrores()
+            iniciarTablaErroresSintacticos()
             val lexico = AnalizadorLexico(codigoFuente.text)
             lexico.analizar()
             llenarTabla(lexico)
@@ -55,7 +66,7 @@ class InicioController {
             if (lexico.listaErrores.isEmpty()) {
                 val sintaxis = AnalizadorSintactico(lexico.listaTokens)
                 val uc = sintaxis.esUnidadDeCompilacion()
-
+                llenarTablaErrorSintactico(sintaxis)
                 if (uc != null) {
                     arbolVisual.root = uc.getArbolVisual()
                 }
@@ -82,6 +93,12 @@ class InicioController {
         colColumna.cellValueFactory = PropertyValueFactory<ErrorObservable,String>("columna")
     }
 
+    private fun iniciarTablaErroresSintacticos(){
+        columnaMensaje.cellValueFactory = PropertyValueFactory<ErrorSintacticoObservable,String>("mensaje")
+        columnaFila.cellValueFactory = PropertyValueFactory<ErrorSintacticoObservable,String>("fila")
+        columnaColumna.cellValueFactory = PropertyValueFactory<ErrorSintacticoObservable,String>("columna")
+    }
+
     private fun llenarTabla(lexico : AnalizadorLexico){
         tablaTokens.items.clear()
         for (elemento in lexico.listaTokens){
@@ -94,6 +111,14 @@ class InicioController {
         tablaError.items.clear()
         for (elemento in lexico.listaErrores){
             tablaError.items.add(ErrorObservable(elemento.lexema,elemento.categoria.toString(),"".plus(elemento.fila),"".plus(elemento.columna)))
+        }
+        tablaTokens.refresh()
+    }
+
+    private fun llenarTablaErrorSintactico(sintaxis : AnalizadorSintactico){
+        tablaErrorSintactico.items.clear()
+        for (elemento in sintaxis.listaErrores){
+            tablaErrorSintactico.items.add(ErrorSintacticoObservable(elemento.error,"".plus(elemento.fila),"".plus(elemento.columna.toString())))
         }
         tablaTokens.refresh()
     }

@@ -5,7 +5,7 @@ import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 
 fun main()
 {
-    val lexico = AnalizadorLexico("Inicio ; mut vnum &a& :: 1@+2 / Fin")
+    val lexico = AnalizadorLexico("Inicio ; mut vnum &a& :: 1@+2 / ")
     //val lexico = AnalizadorLexico("mut")
     //val lexico = AnalizadorLexico("&a&@++/")
     lexico.analizar()
