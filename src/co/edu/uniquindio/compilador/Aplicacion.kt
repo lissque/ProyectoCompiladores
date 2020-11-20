@@ -5,26 +5,13 @@ import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 
 fun main()
 {
-
-<<<<<<< Updated upstream
-    var decision = "si ¿8()12? ¡&a&@++/! dlc ¡&a&@++/!"
-    val lexico = AnalizadorLexico("si ¿8()12? ¡&a&@++/! dlc ¡&a&@++/!")
-=======
-    val lexico = AnalizadorLexico("haha")
->>>>>>> Stashed changes
+    val lexico = AnalizadorLexico("Inicio ; mut vnum &a& :: 1@+2 / Fin")
+    //val lexico = AnalizadorLexico("mut")
+    //val lexico = AnalizadorLexico("&a&@++/")
     lexico.analizar()
+    //print(lexico.listaTokens)
 
-<<<<<<< Updated upstream
     val sintaxis = AnalizadorSintactico(lexico.listaTokens)
-    print(sintaxis.esDecision())
-   // print(sintaxis.listaErrores)
-=======
-    /*val sintaxis = AnalizadorSintactico(lexico.listaTokens)
     print(sintaxis.esUnidadDeCompilacion())
-    print(sintaxis.listaErrores)*/
->>>>>>> Stashed changes
-
-    print(lexico.listaErrores.size)
-
-
+    print(sintaxis.listaErrores)
 }

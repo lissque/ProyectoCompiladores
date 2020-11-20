@@ -23,9 +23,9 @@ class Funcion(var nombreFuncion:Token, var tipoRetorno:Token, var listaParametro
         raiz.children.add(raizParametros)
         var raizSentencia = TreeItem("Sentencias")
         for ( sentencia in listaSentencias){
-            raizParametros.children.add(sentencia.getArbolVisual())
+            raizSentencia.children.add(sentencia.getArbolVisual())
         }
-        raiz.children.add(raizParametros)
+        raiz.children.add(raizSentencia)
         return raiz
     }
 }

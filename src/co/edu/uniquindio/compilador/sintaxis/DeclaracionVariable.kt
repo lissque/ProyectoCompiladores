@@ -1,7 +1,10 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class DeclaracionVariable(var declaracionVariable: ArrayList<String>):Sentencia() {
+import co.edu.uniquindio.compilador.lexico.Token
+
+class DeclaracionVariable(var tipoVariable: Token?, var tipoDato: Token?, var identificador: Token, var expresion: Expresion):Sentencia() {
+
     override fun toString(): String {
-        return "DeclaracionVariable(declaracionVariable=$declaracionVariable)"
+        return "DeclaracionVariable(tipoVariable=$tipoVariable, tipoDato=$tipoDato, identificador=$identificador, expresion=$expresion)"
     }
 }
