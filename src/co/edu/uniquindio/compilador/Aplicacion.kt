@@ -6,13 +6,14 @@ import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 fun main()
 {
 
-    val lexico = AnalizadorLexico("&a&@++/")
+    var decision = "si ¿8()12? ¡&a&@++/! dlc ¡&a&@++/!"
+    val lexico = AnalizadorLexico("si ¿8()12? ¡&a&@++/! dlc ¡&a&@++/!")
     lexico.analizar()
     //print(lexico.listaTokens)
 
     val sintaxis = AnalizadorSintactico(lexico.listaTokens)
-    print(sintaxis.esIncremento())
-    print(sintaxis.listaErrores)
+    print(sintaxis.esDecision())
+   // print(sintaxis.listaErrores)
 
 
 

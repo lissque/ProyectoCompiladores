@@ -164,11 +164,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     }
 
 
-
-
-
-
-
     /**
      * <TipoDato> ::= vnum | vcd | v
      */
@@ -228,120 +223,112 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      *  |"¿"<ExpresionAritmetica>"?" | <ValorNumerico>
      *
      *  <ExpAritmetica> ::= "¿"<ExpAritmetica>"?" [operadorAritmetico <ExpAritmetica>] |
-    <ValorNumerico> [operadorAritmetico <ExpAritmetica>]
+     *  <ValorNumerico> [operadorAritmetico <ExpAritmetica>]
      */
     fun esExpresionAritmetica(): ExpresionAritmetica? {
 
-        var listaExpresionAritmetica = ArrayList<String>()
-        var posicion=posicionActual
 
-        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-            listaExpresionAritmetica.add(""+tokenActual)
+        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ) {
+
             obtenerSiguienteToken()
-            var valorNumerico = esValorNumerico()
+            val eA = esExpresionAritmetica()
+            if (eA != null) {
 
-            while (valorNumerico != null){
-                listaExpresionAritmetica.add(""+valorNumerico)
-                if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO){
-                    listaExpresionAritmetica.add(""+tokenActual)
+                if (tokenActual.categoria == Categoria.INTERROGACIONDER) {
+
                     obtenerSiguienteToken()
-                    valorNumerico = esValorNumerico()
+                    if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO) {
+                        val operador = tokenActual
 
-                }else{
-                    break
+                        obtenerSiguienteToken()
+                        val exp2 = esExpresionAritmetica()
+                        if (exp2 != null) {
+
+
+                            return ExpresionAritmetica(eA, operador, exp2)
+                        }
+                    } else {
+
+                        return ExpresionAritmetica(eA)
+                    }
                 }
             }
-            if (tokenActual.categoria == Categoria.INTERROGACIONDER){
-                listaExpresionAritmetica.add(""+tokenActual)
-                obtenerSiguienteToken()
-                return ExpresionAritmetica(listaExpresionAritmetica)
-            }else{
-                hacerBacktracking(posicion)
+        }else{
+            val valor = esValorNumerico()
+            if (valor != null) {
 
-                return null
-            }
-        }
-        var expresion= esValorNumerico()
-        if (expresion!=null){
-            listaExpresionAritmetica.add(""+expresion)
-            while (tokenActual.categoria==Categoria.OPERADOR_ARITMETICO){
-                listaExpresionAritmetica.add(""+tokenActual)
                 obtenerSiguienteToken()
-                expresion=esValorNumerico()
-                if (expresion!=null){
-                    listaExpresionAritmetica.add(""+expresion)
-                }else{
-                    break
+                if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO) {
+                    val operador = tokenActual
+
+                    obtenerSiguienteToken()
+                    val exp = esExpresionAritmetica()
+                    if (exp != null) {
+
+                        return ExpresionAritmetica(valor, operador, exp)
+                    }
+                } else {
+
+                    return ExpresionAritmetica(valor)
                 }
-
             }
-            if(listaExpresionAritmetica.size>0){
-                return ExpresionAritmetica(listaExpresionAritmetica)
-            }
-
         }
-
         return null
     }
 
     /**
      * <ExpresionRelacional> ::= "¿"<ExpresionRelacional>"?" [operadorRelacional <ExpresionRelacional>] |
-    <ExpresionAritmetica> [operadorRelacional <ExpresionRelacional>]
+     * <ExpresionAritmetica> [operadorRelacional <ExpresionRelacional>]
      *
      * <ExpresionRelacional> ::="<ExpresionRelacional> operadorRelacional <ExpresionRelacional> |
-    "¿"<ExpresionRelacional>"?" | <ExpresionAritmetica>
+     * "¿"<ExpresionRelacional>"?" | <ExpresionAritmetica>
      */
 
     fun esExpresionRelacional(): ExpresionRelacional? {
 
-        var listaExpresionRelacional = ArrayList<String>()
-        var expresionAritmetica= esExpresionAritmetica()
 
-        if (expresionAritmetica!=null){
-            listaExpresionRelacional.add(""+expresionAritmetica)
-            while (tokenActual.categoria==Categoria.OPERADOR_RELACIONAL){
-                listaExpresionRelacional.add(""+tokenActual)
-                obtenerSiguienteToken()
-                expresionAritmetica=esExpresionAritmetica()
-                if (expresionAritmetica!=null){
-                    listaExpresionRelacional.add(""+expresionAritmetica)
-                }else{
-                    break
-                }
+        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ) {
 
-            }
-            if(listaExpresionRelacional.size>0){
-               // obtenerSiguienteToken()
-                return ExpresionRelacional(listaExpresionRelacional)
-
-            }
-            else{
-                return null
-            }
-        }
-        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-            listaExpresionRelacional.add(""+tokenActual)
             obtenerSiguienteToken()
-            expresionAritmetica = esExpresionAritmetica()
-            while (expresionAritmetica != null){
-                listaExpresionRelacional.add(""+expresionAritmetica)
-                if (tokenActual.categoria == Categoria.OPERADOR_RELACIONAL){
-                    listaExpresionRelacional.add(""+tokenActual)
-                    obtenerSiguienteToken()
-                    expresionAritmetica = esExpresionAritmetica()
+            val eA = esExpresionRelacional()
+            if (eA != null) {
 
-                }else{
-                    break
+                if (tokenActual.categoria == Categoria.INTERROGACIONDER) {
+
+                    obtenerSiguienteToken()
+                    if (tokenActual.categoria == Categoria.OPERADOR_RELACIONAL) {
+                        val operador = tokenActual
+
+                        obtenerSiguienteToken()
+                        val exp2 = esExpresionRelacional()
+                        if (exp2 != null) {
+
+                            return ExpresionRelacional(eA, operador, exp2)
+                        }
+                    } else {
+
+                        return ExpresionRelacional(eA)
+                    }
                 }
             }
-            if (tokenActual.categoria == Categoria.INTERROGACIONDER){
-                listaExpresionRelacional.add(""+tokenActual)
-                obtenerSiguienteToken()
-                return ExpresionRelacional(listaExpresionRelacional)
-            }else{
-                return null
-            }
+        }else{
+            val valor = esExpresionAritmetica()
+            if (valor != null) {
 
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.OPERADOR_RELACIONAL) {
+                    val operador = tokenActual
+
+                    obtenerSiguienteToken()
+                    val exp = esExpresionRelacional()
+                    if (exp != null) {
+
+                        return ExpresionRelacional(valor, operador, exp)
+                    }
+                } else {
+                    return ExpresionRelacional(valor)
+                }
+            }
         }
         return null
     }
@@ -353,98 +340,52 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     <ExpresionRelacional> [operadorLogica <ExpresionLogica>]
      */
     fun esExpresionLogica(): ExpresionLogica? {
+        val vl = esExpresionRelacional()
 
-        var listaExpresionLogica = ArrayList<String>()
-        var expresionRelacional= esExpresionRelacional()
-        if (expresionRelacional!=null){
-            listaExpresionLogica.add(""+expresionRelacional)
-            while (tokenActual.categoria==Categoria.OPERADOR_LOGICO){
-                listaExpresionLogica.add(""+tokenActual)
+        if (vl != null) {
+
+            if (tokenActual.categoria == Categoria.OPERADOR_LOGICO && (tokenActual.lexema == "()" || tokenActual.lexema == "¬¬")) {
+                val operadorLogico = tokenActual
                 obtenerSiguienteToken()
-                expresionRelacional=esExpresionRelacional()
-                if (expresionRelacional!=null){
-                    listaExpresionLogica.add(""+expresionRelacional)
-                }else{
-                    break
+                val expresionLogica = esExpresionLogica()
+                if (expresionLogica != null) {
+                    return ExpresionLogica(vl, operadorLogico, expresionLogica)
                 }
-
-            }
-            if(listaExpresionLogica.size>0){
-                return ExpresionLogica(listaExpresionLogica)
-
-            }
-            else{
-                return null
-            }
-        }
-        if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-            listaExpresionLogica.add(""+tokenActual)
-            obtenerSiguienteToken()
-            expresionRelacional = esExpresionRelacional()
-            while (expresionRelacional != null){
-                listaExpresionLogica.add(""+expresionRelacional)
-                  obtenerSiguienteToken()
-                if (tokenActual.categoria == Categoria.OPERADOR_LOGICO){
-                    listaExpresionLogica.add(""+tokenActual)
-                    obtenerSiguienteToken()
-                    expresionRelacional = esExpresionRelacional()
-
-                }else{
-                    break
+            } else if (tokenActual.categoria == Categoria.OPERADOR_LOGICO && (tokenActual.lexema == "{}")) {
+                val operadorNegacion = tokenActual
+                obtenerSiguienteToken()
+                val expresionLogica = esExpresionLogica()
+                if (expresionLogica != null) {
+                    return ExpresionLogica(vl, operadorNegacion, expresionLogica)
                 }
+            } else {
+                return ExpresionLogica(vl)
             }
-            if (tokenActual.categoria == Categoria.INTERROGACIONDER){
-                listaExpresionLogica.add(""+tokenActual)
-                return ExpresionLogica(listaExpresionLogica)
-            }else{
-                return null
-            }
-
         }
         return null
     }
 
     /**
-     *
-    <ExpresionCadena> ::= cadena [<Concatenador> <Expresion> ] | <Expresion> <Concatenador>
-    cadena
-     *
+     *<ExpresionCadena> ::= cadena [<Concatenador> <Expresion> ] | <Expresion> <Concatenador> cadena
      *
      */
 
     fun esExpresionCadena():ExpresionCadena?{
-        var listaExpresionCadena = ArrayList<String>()
-        var expresion=esExpresionAritmetica()
 
-        if(tokenActual.categoria==Categoria.CADENA){
-            listaExpresionCadena.add(""+tokenActual)
+        if (tokenActual.categoria == Categoria.CADENA) {
+            var cadena = tokenActual
             obtenerSiguienteToken()
-            if(tokenActual.categoria==Categoria.OPERADOR_ARITMETICO&&tokenActual.lexema=="@+"){
-                listaExpresionCadena.add(""+tokenActual)
-                expresion=esExpresionAritmetica()
-                if(expresion!=null){
-                    listaExpresionCadena.add(""+expresion)
-                    return ExpresionCadena(listaExpresionCadena)
-                }else{
-                    return null
-                }
-            }
-
-        }
-
-        if(expresion!=null){
-            listaExpresionCadena.add(""+expresion)
-            if(tokenActual.categoria==Categoria.OPERADOR_ARITMETICO&&tokenActual.lexema=="@+") {
-                listaExpresionCadena.add("" + tokenActual)
+            if (tokenActual.categoria != Categoria.OPERADOR_ARITMETICO && tokenActual.lexema != "@+") {
+                return ExpresionCadena(cadena)
+            } else {
+                var mas = tokenActual
                 obtenerSiguienteToken()
-                if(tokenActual.categoria==Categoria.CADENA) {
-                    listaExpresionCadena.add("" + tokenActual)
-                    return ExpresionCadena(listaExpresionCadena)
-                }else{
-                    return null
+                var ex = esExpresion()
+                if (ex != null) {
+                    return ExpresionCadena(cadena, mas, ex)
+                } else {
+                    reportarError("Falta la expresion")
                 }
-
-
             }
         }
         return null
@@ -490,7 +431,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if(sentencia != null){
             return sentencia
         }
-        /**
+
         sentencia = esDeclaracionVariable()
         if(sentencia != null){
             return sentencia
@@ -499,10 +440,12 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if(sentencia != null){
             return sentencia
         }
+
         sentencia = esCicloMientras()
         if(sentencia != null){
             return sentencia
         }
+
         sentencia = esRetorno()
         if(sentencia != null){
             return sentencia
@@ -519,7 +462,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if(sentencia != null){
             return sentencia
         }
-        */
+
         sentencia = esIncremento()
         if(sentencia != null){
             return sentencia
@@ -527,7 +470,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         sentencia = esDecremento()
         if(sentencia != null){
             return sentencia
-        }/**
+        }
         sentencia = esDeclaracionArreglo()
         if(sentencia != null){
             return sentencia
@@ -535,7 +478,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         sentencia = esHacerMientras()
         if(sentencia != null){
             return sentencia
-        }*/
+        }
         sentencia = esDetener()
         return sentencia
     }
@@ -555,21 +498,20 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 sentenciaDesision.add(""+tokenActual)
                 obtenerSiguienteToken()
                 var expresionLogica=esExpresionLogica()
+                println("EXPRESION: " + expresionLogica)
                 if(expresionLogica!=null){
                     sentenciaDesision.add(""+expresionLogica)
                     if(tokenActual.categoria==Categoria.INTERROGACIONDER){
                         sentenciaDesision.add(""+tokenActual)
                         obtenerSiguienteToken()
                         if (tokenActual.categoria==Categoria.ADMIRACIONIZQ){
+                            obtenerSiguienteToken()
                             var listaSentencias=esListaSentencias()
-                            print(listaSentencias)
                             if (listaSentencias!=null){
-                                sentenciaDesision.add(""+expresionLogica)
+                                sentenciaDesision.add(""+listaSentencias)
                                 obtenerSiguienteToken()
                                 if(tokenActual.categoria==Categoria.ADMIRACIONDER){
-                                    sentenciaDesision.add(""+expresionLogica)
-                                     return Decision(sentenciaDesision)
-
+                                    sentenciaDesision.add(""+tokenActual)
                                 }
                                 var deLoContrario = esDeLoContrario()
                                 if(deLoContrario!=null){
@@ -592,9 +534,280 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     }
 
     /**
-     *
-     *
-    <DeLoContrario> ::= dlc "¡" <ListaSentencias> "!"
+     * <DeclaracionVariable> ::= <Variable> <TipoDato> identificador operadorAsignacion <Expresion> "/"
+     */
+    fun esDeclaracionVariable(): DeclaracionVariable?{
+
+        var declaracionVariable = ArrayList<String>()
+        var tipoVariable = esVariable()
+
+        if (tipoVariable != null) {
+            declaracionVariable.add("" + tipoVariable)
+            obtenerSiguienteToken()
+            var tipoDeDato = esTipoDeDato()
+            if (tipoDeDato != null){
+                declaracionVariable.add("" + tipoDeDato)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+                    declaracionVariable.add("" + tokenActual)
+                    obtenerSiguienteToken()
+                    if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
+                        declaracionVariable.add("" + tokenActual)
+                        var expresion = esExpresion()
+                        if (expresion != null){
+                            declaracionVariable.add("" + expresion)
+                            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                declaracionVariable.add("" + tokenActual)
+                                return DeclaracionVariable(declaracionVariable)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <Asignacion> ::= identificador operadorAsignacion <Expresion> "/"
+     */
+
+    fun esAsignacion(): Asignacion?{
+        var asignacion = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+            asignacion.add("" + tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
+                asignacion.add("" + tokenActual)
+                var expresion = esExpresion()
+                if (expresion != null){
+                    asignacion.add("" + expresion)
+                    if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                        asignacion.add("" + tokenActual)
+                        return Asignacion(asignacion)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <CicloMientras> ::= mientras "¿" <ExpresionLogica> "?" "¡" <ListaSentencias> "!"
+     */
+    fun esCicloMientras(): CicloMientras?{
+        var cicloMientras = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mientras"){
+            cicloMientras.add("" + tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+                cicloMientras.add("" + tokenActual)
+                var expresion = esExpresionLogica()
+                if (expresion != null){
+                    cicloMientras.add("" + expresion)
+                    obtenerSiguienteToken()
+                    if (tokenActual.categoria == Categoria.INTERROGACIONDER){
+                        cicloMientras.add("" + tokenActual)
+                        obtenerSiguienteToken()
+                        if (tokenActual.categoria == Categoria.ADMIRACIONIZQ){
+                            cicloMientras.add("" + tokenActual)
+                            var sentencias = esListaSentencias()
+                            if (sentencias != null){
+                                cicloMientras.add("" + tokenActual)
+                                obtenerSiguienteToken()
+                                if (tokenActual.categoria == Categoria.ADMIRACIONDER){
+                                    cicloMientras.add("" + tokenActual)
+                                    return CicloMientras(cicloMientras)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <Retorno> ::= retornar <Expresion> "/"
+     */
+    fun esRetorno(): Retorno?{
+        var retorno = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "retornar"){
+            retorno.add("" + tokenActual)
+            obtenerSiguienteToken()
+            var expresion = esExpresion()
+            if (expresion != null){
+                retorno.add("" + expresion)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                    retorno.add("" + tokenActual)
+                    return Retorno(retorno)
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <Impresion> ::= imprimir <Expresion> "/"
+     */
+    fun esImpresion(): Impresion?{
+        var imprimir = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "imprimir"){
+            imprimir.add("" + tokenActual)
+            obtenerSiguienteToken()
+            var expresion = esExpresion()
+            if (expresion != null){
+                imprimir.add("" + expresion)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                    imprimir.add("" + tokenActual)
+                    return Impresion(imprimir)
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <Lectura> ::= leer <Expresion> "/"
+     */
+    fun esLectura(): Lectura?{
+        var leer = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "leer"){
+            leer.add("" + tokenActual)
+            obtenerSiguienteToken()
+            var expresion = esExpresion()
+            if (expresion != null){
+                leer.add("" + expresion)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                    leer.add("" + tokenActual)
+                    return Lectura(leer)
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <InvocacionFuncion> ::= identificador operadorAsignacion identificador "¿" [<ListaArgumentos>] "?" "/"
+     * | identificador "¿" [<ListaArgumentos>] "?" "/"
+     */
+    fun esInvocacionFuncion(): InvocacionFuncion?{
+        var invocacionFuncion = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+            invocacionFuncion.add("" + tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
+                invocacionFuncion.add("" + tokenActual)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+                    invocacionFuncion.add("" + tokenActual)
+                    obtenerSiguienteToken()
+                    if(tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+                        invocacionFuncion.add("" + tokenActual)
+                        obtenerSiguienteToken()
+                        var argumentos = esListaArgumentos()
+                        if(argumentos != null){
+                            invocacionFuncion.add("" + argumentos)
+                            obtenerSiguienteToken()
+                            if(tokenActual.categoria == Categoria.INTERROGACIONDER){
+                                invocacionFuncion.add("" + tokenActual)
+                                obtenerSiguienteToken()
+                                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                    invocacionFuncion.add("" + tokenActual)
+                                    return InvocacionFuncion(invocacionFuncion)
+                                }
+                            }
+                        }
+                    }
+                }
+            }else{
+                if(tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+                    invocacionFuncion.add("" + tokenActual)
+                    obtenerSiguienteToken()
+                    var argumentos = esListaArgumentos()
+                    if(argumentos != null){
+                        invocacionFuncion.add("" + argumentos)
+                        obtenerSiguienteToken()
+                        if(tokenActual.categoria == Categoria.INTERROGACIONDER){
+                            invocacionFuncion.add("" + tokenActual)
+                            obtenerSiguienteToken()
+                            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                invocacionFuncion.add("" + tokenActual)
+                                return InvocacionFuncion(invocacionFuncion)
+                            }
+                        }
+                    }else{
+                        if(tokenActual.categoria == Categoria.INTERROGACIONDER) {
+                            invocacionFuncion.add("" + tokenActual)
+                            obtenerSiguienteToken()
+                            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                invocacionFuncion.add("" + tokenActual)
+                                return InvocacionFuncion(invocacionFuncion)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
+     * <ListaArgumentos> ::= <Argumento> ["^" <ListaArgumentos> ]
+     */
+    fun esListaArgumentos(): ArrayList<Expresion>? {
+
+        var listaArgumentos = ArrayList<Expresion>()
+        var argumento = esArgumento()
+
+        while (argumento != null) {
+
+            listaArgumentos.add(argumento)
+
+            if(tokenActual.categoria == Categoria.SEPARADOR){
+                obtenerSiguienteToken()
+                argumento = esArgumento()
+            }else{
+                if (tokenActual.categoria != Categoria.INTERROGACIONIZQ){
+
+                    reportarError("Falta un separador en la lista de parametros")
+                }
+                break
+            }
+
+        }
+        if (listaArgumentos.size > 0){
+            return listaArgumentos
+        }
+
+        return null
+    }
+
+    /**
+     * <Argumento> ::= <Expresion>
+     */
+
+    fun esArgumento():Expresion? {
+        var expresion = esExpresion()
+
+        if(expresion != null){
+            return expresion
+        }
+        return null
+    }
+
+    /**
+     * <DeLoContrario> ::= dlc "¡" <ListaSentencias> "!"
      */
 
     fun esDeLoContrario():DeLoContrario?{
@@ -684,6 +897,84 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     }
 
     /**
+     * <DeclaracionArreglos> ::= mut vnum identificador "[" "]" operadorAsignacion "[" <ListaValoresNumericos> "]" "/"
+     */
+    fun esDeclaracionArreglo(): DeclaracionArreglo?{
+
+        var declaracionArreglo = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mut"){
+            declaracionArreglo.add(""+tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "vnum"){
+                declaracionArreglo.add(""+tokenActual)
+                obtenerSiguienteToken()
+                if (tokenActual.categoria == Categoria.IDENTIFICADOR){
+                    declaracionArreglo.add(""+tokenActual)
+                    obtenerSiguienteToken()
+                    if (tokenActual.categoria == Categoria.CORCHETEIZQ){
+                        declaracionArreglo.add(""+tokenActual)
+                        obtenerSiguienteToken()
+                        if (tokenActual.categoria == Categoria.CORCHETEDER){
+                            declaracionArreglo.add(""+tokenActual)
+                            obtenerSiguienteToken()
+                            if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
+                                declaracionArreglo.add(""+tokenActual)
+                                obtenerSiguienteToken()
+                                if (tokenActual.categoria == Categoria.CORCHETEIZQ){
+                                    declaracionArreglo.add(""+tokenActual)
+                                    obtenerSiguienteToken()
+                                    var listaValoresNumericos = esListaValoresNumericos()
+                                    if (listaValoresNumericos != null){
+                                        declaracionArreglo.add(""+listaValoresNumericos)
+                                        obtenerSiguienteToken()
+                                        if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                            declaracionArreglo.add(""+tokenActual)
+                                            return DeclaracionArreglo(declaracionArreglo)
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+    /**
+     * <ListaValoresNumericos> ::= <ValorNumerico> ["^"<ValorNumerico>]
+     */
+    fun esListaValoresNumericos(): ArrayList<ValorNumerico>? {
+
+        var listaValoresNumericos = ArrayList<ValorNumerico>()
+        var valorNumerico = esValorNumerico()
+
+        while (valorNumerico != null) {
+
+            listaValoresNumericos.add(valorNumerico)
+
+            if(tokenActual.categoria == Categoria.SEPARADOR){
+                obtenerSiguienteToken()
+                valorNumerico = esValorNumerico()
+            }else{
+                if (tokenActual.categoria != Categoria.INTERROGACIONIZQ){
+
+                    reportarError("Falta un separador en la lista de parametros")
+                }
+                break
+            }
+
+        }
+        if (listaValoresNumericos.size > 0){
+            return listaValoresNumericos
+        }
+
+        return null
+    }
+
+    /**
      * <ValorNumerico> ::= [<Signo>] <Numerico> | [<Signo>] identificador
      */
     fun esValorNumerico(): ValorNumerico?{
@@ -707,12 +998,60 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     }
 
     /**
+     * <HacerMientras> ::= hacer "¡" <ListaSentencias> "!" mientras "¿" <ExpresionLogica> "?" "/"
+     */
+    fun esHacerMientras(): HacerMientras?{
+
+        var hacerMientras = ArrayList<String>()
+
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "hacer"){
+            hacerMientras.add(""+tokenActual)
+            obtenerSiguienteToken()
+            if (tokenActual.categoria == Categoria.ADMIRACIONIZQ){
+                hacerMientras.add(""+tokenActual)
+                obtenerSiguienteToken()
+                var sentencias = esListaSentencias()
+                if (sentencias != null){
+                    hacerMientras.add(""+sentencias)
+                    obtenerSiguienteToken()
+                    if (tokenActual.categoria == Categoria.ADMIRACIONDER){
+                        hacerMientras.add(""+tokenActual)
+                        obtenerSiguienteToken()
+                        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mientras"){
+                            hacerMientras.add(""+tokenActual)
+                            obtenerSiguienteToken()
+                            if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
+                                hacerMientras.add(""+tokenActual)
+                                obtenerSiguienteToken()
+                                var expresion = esExpresionLogica()
+                                if (expresion != null){
+                                    hacerMientras.add(""+expresion)
+                                    obtenerSiguienteToken()
+                                    if (tokenActual.categoria == Categoria.INTERROGACIONDER){
+                                        hacerMientras.add(""+tokenActual)
+                                        obtenerSiguienteToken()
+                                        if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                            hacerMientras.add(""+tokenActual)
+                                            return HacerMientras(hacerMientras)
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    /**
      * <Variable> ::= mut | inm
      */
     fun esVariable(): Token? {
-        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA) {
-            var tipoVariable = tokenActual
-            return tipoVariable
+        if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && (tokenActual.lexema == "mut" || tokenActual.lexema == "inm")) {
+            return tokenActual
         }
 
         return null
@@ -723,8 +1062,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esConcatenador(): Token? {
         if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO && tokenActual.lexema == "@+") {
-            var concatenador = tokenActual
-            return concatenador
+            return tokenActual
         }
 
         return null
@@ -735,9 +1073,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esSigno(): Token? {
         if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO && (tokenActual.lexema == "@+" || tokenActual.lexema == "@-")) {
-
-            var signo = tokenActual
-            return signo
+            return tokenActual
         }
 
         return null
