@@ -510,6 +510,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if (sentencia != null) {
             return sentencia
         }
+        //No funciona muy bien
         sentencia = esInvocacionFuncion()
         if (sentencia != null) {
             return sentencia
@@ -519,10 +520,12 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if (sentencia != null) {
             return sentencia
         }
+        //Falta arreglar
         sentencia = esDeclaracionArreglo()
         if (sentencia != null) {
             return sentencia
         }
+        //Falta arreglar
         sentencia = esHacerMientras()
         if (sentencia != null) {
             return sentencia
@@ -719,19 +722,19 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esRetorno(): Retorno?{
         var pos = posicionActual
-        var retorno = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "retornar"){
-            retorno.add("" + tokenActual)
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                retorno.add("" + expresion)
                 obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                    retorno.add("" + tokenActual)
-                    return Retorno(retorno)
+                    return Retorno(expresion)
+                }else{
+                    reportarError("Falta fin de sentencia")
                 }
+            }else{
+                reportarError("No hay ninguna expresion")
             }
         }
         hacerBacktracking(pos)
@@ -743,19 +746,19 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esImpresion(): Impresion?{
         var pos = posicionActual
-        var imprimir = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "imprimir"){
-            imprimir.add("" + tokenActual)
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                imprimir.add("" + expresion)
                 obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                    imprimir.add("" + tokenActual)
-                    return Impresion(imprimir)
+                    return Impresion(expresion)
+                }else{
+                    reportarError("Falta fin de sentencia")
                 }
+            }else{
+                reportarError("No hay ninguna expresion")
             }
         }
         hacerBacktracking(pos)
@@ -767,19 +770,19 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esLectura(): Lectura?{
         var pos = posicionActual
-        var leer = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "leer"){
-            leer.add("" + tokenActual)
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                leer.add("" + expresion)
                 obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                    leer.add("" + tokenActual)
-                    return Lectura(leer)
+                    return Lectura(expresion)
+                }else{
+                    reportarError("Falta fin de sentencia")
                 }
+            }else{
+                reportarError("No hay ninguna expresion")
             }
         }
         hacerBacktracking(pos)
@@ -792,61 +795,78 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esInvocacionFuncion(): InvocacionFuncion?{
         var pos = posicionActual
-        var invocacionFuncion = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-            invocacionFuncion.add("" + tokenActual)
+            var identificadorVariable = tokenActual
             obtenerSiguienteToken()
             if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
-                invocacionFuncion.add("" + tokenActual)
                 obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-                    invocacionFuncion.add("" + tokenActual)
+                    var identificadorFuncion = tokenActual
                     obtenerSiguienteToken()
                     if(tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-                        invocacionFuncion.add("" + tokenActual)
                         obtenerSiguienteToken()
                         var argumentos = esListaArgumentos()
                         if(argumentos != null){
-                            invocacionFuncion.add("" + argumentos)
                             obtenerSiguienteToken()
                             if(tokenActual.categoria == Categoria.INTERROGACIONDER){
-                                invocacionFuncion.add("" + tokenActual)
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                    invocacionFuncion.add("" + tokenActual)
-                                    return InvocacionFuncion(invocacionFuncion)
+                                    return InvocacionFuncion(identificadorVariable,identificadorVariable,argumentos)
+                                }else{
+                                    reportarError("Falta fin de sentencia")
                                 }
+                            }else{
+                                reportarError("Falta signo de interrogacion derecho")
+                            }
+                        }else{
+                            if(tokenActual.categoria == Categoria.INTERROGACIONDER){
+                                obtenerSiguienteToken()
+                                if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                    return InvocacionFuncion(identificadorVariable,identificadorVariable,argumentos)
+                                }else{
+                                    reportarError("Falta fin de sentencia")
+                                }
+                            }else{
+                                reportarError("Falta signo de interrogacion derecho")
                             }
                         }
+                    }else{
+                        reportarError("Falta signo de interrogacion izquierdo")
                     }
                 }
             }else{
                 if(tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-                    invocacionFuncion.add("" + tokenActual)
+                    println("ANTES: "+tokenActual)
                     obtenerSiguienteToken()
+                    println("DESPUES: "+tokenActual)
                     var argumentos = esListaArgumentos()
                     if(argumentos != null){
-                        invocacionFuncion.add("" + argumentos)
                         obtenerSiguienteToken()
                         if(tokenActual.categoria == Categoria.INTERROGACIONDER){
-                            invocacionFuncion.add("" + tokenActual)
                             obtenerSiguienteToken()
                             if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                invocacionFuncion.add("" + tokenActual)
-                                return InvocacionFuncion(invocacionFuncion)
+                                return InvocacionFuncion(identificadorVariable,argumentos)
+                            }else{
+                                reportarError("Falta fin de sentencia")
                             }
+                        }else{
+                            reportarError("Falta signo de interrogacion derecho")
                         }
                     }else{
                         if(tokenActual.categoria == Categoria.INTERROGACIONDER) {
-                            invocacionFuncion.add("" + tokenActual)
                             obtenerSiguienteToken()
                             if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                invocacionFuncion.add("" + tokenActual)
-                                return InvocacionFuncion(invocacionFuncion)
+                                return InvocacionFuncion(identificadorVariable,argumentos)
+                            }else{
+                                reportarError("Falta fin de sentencia")
                             }
+                        }else{
+                            reportarError("Falta signo de interrogacion derecho")
                         }
                     }
+                }else{
+                    reportarError("Falta signo de interrogacion izquierdo")
                 }
             }
         }
@@ -863,10 +883,10 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         var listaArgumentos = ArrayList<Expresion>()
         var argumento = esArgumento()
 
+
         while (argumento != null) {
 
             listaArgumentos.add(argumento)
-
             if(tokenActual.categoria == Categoria.SEPARADOR){
                 obtenerSiguienteToken()
                 argumento = esArgumento()
@@ -906,30 +926,27 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
 
     fun esDeLoContrario():DeLoContrario?{
-        var pos = posicionActual
-        var sentenciaDeLoContrario=ArrayList<String>()
 
         if (tokenActual.categoria==Categoria.PALABRA_RESERVADA&&tokenActual.lexema=="dlc"){
-            sentenciaDeLoContrario.add(""+tokenActual)
             obtenerSiguienteToken()
             if (tokenActual.categoria==Categoria.ADMIRACIONIZQ){
-                sentenciaDeLoContrario.add(""+tokenActual)
                 obtenerSiguienteToken()
                 var listaSentencia=esListaSentencias()
                 if (listaSentencia!=null){
-                    sentenciaDeLoContrario.add(""+listaSentencia)
                     obtenerSiguienteToken()
                     if(tokenActual.categoria==Categoria.ADMIRACIONDER){
-                        sentenciaDeLoContrario.add(""+tokenActual)
-                        return DeLoContrario(sentenciaDeLoContrario)
+                        return DeLoContrario(listaSentencia)
                     }else{
-                        return null
+                        reportarError("Falta signo de admiracion derecho")
                     }
-
+                }else{
+                    reportarError("No hay niguna sentecia")
                 }
-
+            }else{
+                reportarError("Falta signo de admiracion izquierdo")
             }
         }
+
         return null
     }
 
@@ -948,8 +965,11 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                     return Incremento(nombreVariable)
+                }else{
+                    reportarError("Falta fin de sentencia")
                 }
-
+            }else{
+                reportarError("Falta operador de inremento")
             }
         }
         hacerBacktracking(pos)
@@ -970,8 +990,11 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                     return Decremento(nombreVariable)
+                }else{
+                    reportarError("Falta fin de sentencia")
                 }
-
+            }else{
+                reportarError("Falta operador de decremento")
             }
         }
         hacerBacktracking(pos)
@@ -989,6 +1012,8 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
             if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                 return Detener(sentenciaDetener)
+            }else{
+                reportarError("Falta fin de sentencia")
             }
         }
         hacerBacktracking(pos)

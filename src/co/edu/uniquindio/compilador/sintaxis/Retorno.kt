@@ -1,7 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class Retorno(var retorno: ArrayList<String>):Sentencia() {
+class Retorno(var expresion: Expresion):Sentencia() {
     override fun toString(): String {
-        return "Retorno(retorno=$retorno)"
+        return "Retorno(expresion=$expresion)"
     }
 }

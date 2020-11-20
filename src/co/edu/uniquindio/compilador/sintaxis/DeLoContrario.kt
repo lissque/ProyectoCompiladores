@@ -1,7 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class DeLoContrario(var sentenciaDeLoContrario:ArrayList<String>) {
+class DeLoContrario(var listaSentencia: ArrayList<Sentencia>?) {
     override fun toString(): String {
-        return "DeLoContrario(sentenciaDeLoContrario=$sentenciaDeLoContrario)"
+        return "DeLoContrario(listaSentencia=$listaSentencia)"
     }
 }
