@@ -3,7 +3,6 @@ package co.edu.uniquindio.compilador.sintaxis
 import co.edu.uniquindio.compilador.lexico.Categoria
 import co.edu.uniquindio.compilador.lexico.Error
 import co.edu.uniquindio.compilador.lexico.Token
-import kotlin.math.exp
 
 class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
@@ -52,11 +51,15 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                     obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "Fin") {
                         return UnidadDeCompilacion(listaDeclaracionVariable, null)
+                    }else{
+                        reportarError("Falta la palabra reservada Fin al final")
                     }
                 } else if (listaFunciones.size > 0) {
                     obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "Fin") {
                         return UnidadDeCompilacion(null, listaFunciones)
+                    }else{
+                        reportarError("Falta la palabra reservada Fin al final")
                     }
                 }
 
@@ -434,8 +437,15 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
 
     private fun hacerBacktracking(posInicial: Int) {
+        //posicionActual = posInicial
+        //tokenActual = listaTokens[posicionActual]
+
         posicionActual = posInicial
-        tokenActual = listaTokens[posicionActual]
+        tokenActual = if (posInicial < listaTokens.size) {
+            listaTokens[posInicial]
+        } else {
+            Token("", Categoria.DESCONOCIDO, 0, 0)
+        }
     }
 
     /**
@@ -452,7 +462,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             sentencia = esSentencia()
         }
 
-        print(listaSentencias.size)
         if (listaSentencias.size > 0) {
             return listaSentencias
         }
@@ -527,45 +536,53 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esDecision(): Decision? {
         var pos = posicionActual
-        var sentenciaDesision = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "si") {
-            sentenciaDesision.add("" + tokenActual)
+
             obtenerSiguienteToken()
 
             if (tokenActual.categoria == Categoria.INTERROGACIONIZQ) {
-                sentenciaDesision.add("" + tokenActual)
+
                 obtenerSiguienteToken()
                 var expresionLogica = esExpresionLogica()
-                println("EXPRESION: " + expresionLogica)
+
                 if (expresionLogica != null) {
-                    sentenciaDesision.add("" + expresionLogica)
+
                     if (tokenActual.categoria == Categoria.INTERROGACIONDER) {
-                        sentenciaDesision.add("" + tokenActual)
+
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.ADMIRACIONIZQ) {
                             obtenerSiguienteToken()
                             var listaSentencias = esListaSentencias()
                             if (listaSentencias != null) {
-                                sentenciaDesision.add("" + listaSentencias)
+
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.ADMIRACIONDER) {
-                                    sentenciaDesision.add("" + tokenActual)
-                                }
-                                var deLoContrario = esDeLoContrario()
-                                if (deLoContrario != null) {
-                                    sentenciaDesision.add("" + deLoContrario)
                                     obtenerSiguienteToken()
-                                    return Decision(sentenciaDesision)
+                                    var deLoContrario = esDeLoContrario()
+                                    if (deLoContrario != null) {
+                                        return Decision(expresionLogica, listaSentencias, deLoContrario)
 
-                                } else {
-                                    return Decision(sentenciaDesision)
+                                    } else {
+                                        return Decision(expresionLogica, listaSentencias, deLoContrario)
+                                    }
+                                }else{
+                                    reportarError("Falta signo de admiracion derecho")
                                 }
+                            }else{
+                                reportarError("No hay lista de sentencias")
                             }
-
+                        }else{
+                            reportarError("Falta signo de admiracion izquierdo")
                         }
+                    }else{
+                        reportarError("Falta signo de interrogacion derecho")
                     }
+                }else{
+                    reportarError("No hay una expresion logica")
                 }
+            }else{
+                reportarError("Falta signo de interrogacion izquierdo")
             }
 
         }
@@ -580,6 +597,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         var pos = posicionActual
 
         var tipoVariable = esVariable()
+
         if (tipoVariable != null) {
             obtenerSiguienteToken()
             var tipoDeDato = esTipoDeDato()
@@ -626,21 +644,25 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
     fun esAsignacion(): Asignacion?{
         var pos = posicionActual
-        var asignacion = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-            asignacion.add("" + tokenActual)
+            var identificador = tokenActual
             obtenerSiguienteToken()
             if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
-                asignacion.add("" + tokenActual)
+                obtenerSiguienteToken()
                 var expresion = esExpresion()
                 if (expresion != null){
-                    asignacion.add("" + expresion)
+                    obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                        asignacion.add("" + tokenActual)
-                        return Asignacion(asignacion)
+                        return Asignacion(identificador,expresion)
+                    }else{
+                        reportarError("Falta fin de sentencia")
                     }
+                }else{
+                    reportarError("No hay una expresion")
                 }
+            }else{
+                reportarError("Falta operador de asignacion")
             }
         }
         hacerBacktracking(pos)
@@ -652,34 +674,40 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esCicloMientras(): CicloMientras?{
         var pos = posicionActual
-        var cicloMientras = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mientras"){
-            cicloMientras.add("" + tokenActual)
             obtenerSiguienteToken()
             if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-                cicloMientras.add("" + tokenActual)
+                obtenerSiguienteToken()
                 var expresion = esExpresionLogica()
                 if (expresion != null){
-                    cicloMientras.add("" + expresion)
-                    obtenerSiguienteToken()
+
                     if (tokenActual.categoria == Categoria.INTERROGACIONDER){
-                        cicloMientras.add("" + tokenActual)
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.ADMIRACIONIZQ){
-                            cicloMientras.add("" + tokenActual)
+                            obtenerSiguienteToken()
                             var sentencias = esListaSentencias()
                             if (sentencias != null){
-                                cicloMientras.add("" + tokenActual)
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.ADMIRACIONDER){
-                                    cicloMientras.add("" + tokenActual)
-                                    return CicloMientras(cicloMientras)
+                                    return CicloMientras(expresion, sentencias)
+                                }else{
+                                    reportarError("Falta signo de admiracion derecho")
                                 }
+                            }else{
+                                reportarError("No hay lista de sentencias")
                             }
+                        }else{
+                            reportarError("Falta signo de admiracion izquierdo")
                         }
+                    }else{
+                        reportarError("Falta signo de interrogacion derecho")
                     }
+                }else{
+                    reportarError("No hay una expresion logica")
                 }
+            }else{
+                reportarError("Falta signo de interrogacion izquierdo")
             }
         }
         hacerBacktracking(pos)

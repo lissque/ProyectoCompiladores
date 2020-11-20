@@ -1,7 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class CicloMientras(var cicloMientras: ArrayList<String>):Sentencia() {
+class CicloMientras(var expresion: Expresion, var sentencia: ArrayList<Sentencia>?):Sentencia() {
     override fun toString(): String {
-        return "CicloMientras(cicloMientras=$cicloMientras)"
+        return "CicloMientras(expresion=$expresion, sentencia=$sentencia)"
     }
 }

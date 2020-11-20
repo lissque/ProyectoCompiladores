@@ -1,7 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
-class Decision(var listaDescision:ArrayList<String>): Sentencia() {
+class Decision(var expresionLogica: ExpresionLogica, var listaSentencia: ArrayList<Sentencia>?, var deLoContrario: DeLoContrario?): Sentencia() {
     override fun toString(): String {
-        return "Decision(listaDescision=$listaDescision)"
+        return "Decision(expresionLogica=$expresionLogica, listaSentencia=$listaSentencia, deLoContrario=$deLoContrario)"
     }
 }

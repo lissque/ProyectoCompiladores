@@ -27,4 +27,10 @@ class ExpresionRelacional(): Expresion() {
     constructor(expresionAritmetica:ExpresionAritmetica?):this(){
         this.expresionAritmetica = expresionAritmetica
     }
+
+    override fun toString(): String {
+        return "ExpresionRelacional(expresionRelacional1=$expresionRelacional1, expresionRelacional2=$expresionRelacional2, operador=$operador, expresionAritmetica=$expresionAritmetica)"
+    }
+
+
 }

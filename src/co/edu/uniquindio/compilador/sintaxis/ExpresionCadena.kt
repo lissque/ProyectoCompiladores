@@ -16,4 +16,10 @@ class ExpresionCadena(): Expresion() {
     constructor(cadena:Token?):this(){
         this.cadena = cadena
     }
+
+    override fun toString(): String {
+        return "ExpresionCadena(cadena=$cadena, mas=$mas, exp=$exp)"
+    }
+
+
 }
