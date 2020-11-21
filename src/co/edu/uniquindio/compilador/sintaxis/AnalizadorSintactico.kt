@@ -102,7 +102,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 if (tokenActual.categoria == Categoria.INTERROGACIONIZQ) {
                     obtenerSiguienteToken()
 
-                    var listaParametros = null
+                    var listaParametros = esListaParametros()
 
                     if (tokenActual.categoria == Categoria.INTERROGACIONDER) {
                         obtenerSiguienteToken()
@@ -170,10 +170,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 obtenerSiguienteToken()
                 parametro = esParametro()
             } else {
-                if (tokenActual.categoria != Categoria.INTERROGACIONIZQ) {
-
-                    reportarError("Falta un separador en la lista de parametros")
-                }
                 break
             }
 
@@ -559,7 +555,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                             var listaSentencias = esListaSentencias()
                             if (listaSentencias != null) {
 
-                                obtenerSiguienteToken()
+                                //obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.ADMIRACIONDER) {
                                     obtenerSiguienteToken()
                                     var deLoContrario = esDeLoContrario()
@@ -665,7 +661,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                     reportarError("No hay una expresion")
                 }
             }else{
-                reportarError("Falta operador de asignacion")
+                reportarError("Falta operador de asignacion...")
             }
         }
         hacerBacktracking(pos)
@@ -882,19 +878,12 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         var pos = posicionActual
         var listaArgumentos = ArrayList<Expresion>()
         var argumento = esArgumento()
-
-
         while (argumento != null) {
 
             listaArgumentos.add(argumento)
             if(tokenActual.categoria == Categoria.SEPARADOR){
-                obtenerSiguienteToken()
                 argumento = esArgumento()
             }else{
-                if (tokenActual.categoria != Categoria.INTERROGACIONIZQ){
-
-                    reportarError("Falta un separador en la lista de parametros")
-                }
                 break
             }
 
@@ -933,7 +922,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 obtenerSiguienteToken()
                 var listaSentencia=esListaSentencias()
                 if (listaSentencia!=null){
-                    obtenerSiguienteToken()
+                    //obtenerSiguienteToken()
                     if(tokenActual.categoria==Categoria.ADMIRACIONDER){
                         return DeLoContrario(listaSentencia)
                     }else{
@@ -1025,44 +1014,56 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esDeclaracionArreglo(): DeclaracionArreglo?{
         var pos = posicionActual
-        var declaracionArreglo = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mut"){
-            declaracionArreglo.add(""+tokenActual)
+            var tipoVariable = tokenActual
             obtenerSiguienteToken()
             if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "vnum"){
-                declaracionArreglo.add(""+tokenActual)
+                var tipoDeDato = tokenActual
                 obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.IDENTIFICADOR){
-                    declaracionArreglo.add(""+tokenActual)
+                    var identificador = tokenActual
                     obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.CORCHETEIZQ){
-                        declaracionArreglo.add(""+tokenActual)
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.CORCHETEDER){
-                            declaracionArreglo.add(""+tokenActual)
                             obtenerSiguienteToken()
                             if (tokenActual.categoria == Categoria.OPERADOR_ASIGNACION){
-                                declaracionArreglo.add(""+tokenActual)
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.CORCHETEIZQ){
-                                    declaracionArreglo.add(""+tokenActual)
                                     obtenerSiguienteToken()
                                     var listaValoresNumericos = esListaValoresNumericos()
                                     if (listaValoresNumericos != null){
-                                        declaracionArreglo.add(""+listaValoresNumericos)
-                                        obtenerSiguienteToken()
-                                        if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                            declaracionArreglo.add(""+tokenActual)
-                                            return DeclaracionArreglo(declaracionArreglo)
+                                        if (tokenActual.categoria == Categoria.CORCHETEDER){
+                                            obtenerSiguienteToken()
+                                            if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
+                                                return DeclaracionArreglo(tipoVariable, tipoDeDato, identificador, listaValoresNumericos)
+                                            }else{
+                                                reportarError("Falta fin de sentencia")
+                                            }
+                                        }else{
+                                            reportarError("Falta el corchete derecho")
                                         }
+                                    }else{
+                                        reportarError("No hay lista de valores numericos")
                                     }
+                                }else{
+                                    reportarError("Falta el corchete izquierdo")
                                 }
+                            }else{
+                                reportarError("Falta el operador de asignacion")
                             }
-
+                        }else{
+                            reportarError("Falta el corchete derecho")
                         }
+                    }else{
+                        reportarError("Falta el corchete izquierdp")
                     }
+                }else{
+                    reportarError("Falta el identificador del arreglo")
                 }
+            }else{
+                reportarError("Falta el tipo de dato")
             }
         }
         hacerBacktracking(pos)
@@ -1084,10 +1085,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 obtenerSiguienteToken()
                 valorNumerico = esValorNumerico()
             }else{
-                if (tokenActual.categoria != Categoria.INTERROGACIONIZQ){
-
-                    reportarError("Falta un separador en la lista de parametros")
-                }
                 break
             }
 
@@ -1127,45 +1124,50 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esHacerMientras(): HacerMientras?{
         var pos = posicionActual
-        var hacerMientras = ArrayList<String>()
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "hacer"){
-            hacerMientras.add(""+tokenActual)
             obtenerSiguienteToken()
             if (tokenActual.categoria == Categoria.ADMIRACIONIZQ){
-                hacerMientras.add(""+tokenActual)
                 obtenerSiguienteToken()
                 var sentencias = esListaSentencias()
                 if (sentencias != null){
-                    hacerMientras.add(""+sentencias)
-                    obtenerSiguienteToken()
+                    //obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.ADMIRACIONDER){
-                        hacerMientras.add(""+tokenActual)
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mientras"){
-                            hacerMientras.add(""+tokenActual)
                             obtenerSiguienteToken()
                             if (tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-                                hacerMientras.add(""+tokenActual)
                                 obtenerSiguienteToken()
                                 var expresion = esExpresionLogica()
                                 if (expresion != null){
-                                    hacerMientras.add(""+expresion)
-                                    obtenerSiguienteToken()
+                                    //obtenerSiguienteToken()
                                     if (tokenActual.categoria == Categoria.INTERROGACIONDER){
-                                        hacerMientras.add(""+tokenActual)
                                         obtenerSiguienteToken()
                                         if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                            hacerMientras.add(""+tokenActual)
-                                            return HacerMientras(hacerMientras)
+                                            return HacerMientras(sentencias,expresion)
+                                        } else{
+                                            reportarError("Falta fin de sentencia")
                                         }
+                                    } else{
+                                      reportarError("Falta interrogacion derecha")
                                     }
+                                }else{
+                                    reportarError("No hay expresiones!")
                                 }
-
+                            }else{
+                                reportarError("Falta interrogacion izquierdo")
                             }
+                        }else {
+                            reportarError("Falta palabra reservada Mientras")
                         }
+                    } else{
+                        reportarError("Falta admiracion derecha")
                     }
+                }else{
+                    reportarError("No hay sentencias por hacer")
                 }
+            } else {
+              reportarError("Falta admiración izquierda")
             }
         }
         hacerBacktracking(pos)

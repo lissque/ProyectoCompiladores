@@ -1,6 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
 import co.edu.uniquindio.compilador.lexico.Token
+import javafx.scene.control.TreeItem
 
 class ExpresionRelacional(): Expresion() {
     var expresionRelacional1:ExpresionRelacional? = null
@@ -26,6 +27,23 @@ class ExpresionRelacional(): Expresion() {
 
     constructor(expresionAritmetica:ExpresionAritmetica?):this(){
         this.expresionAritmetica = expresionAritmetica
+    }
+
+    override open fun getArbolVisual(): TreeItem<String> {
+        var raiz = TreeItem("Relacional")
+        if (expresionRelacional1!=null){
+            raiz.children.add(expresionRelacional1!!.getArbolVisual())
+        }
+        if (expresionRelacional2!=null){
+            raiz.children.add(expresionRelacional2!!.getArbolVisual())
+        }
+        if (operador!=null){
+            raiz.children.add(TreeItem("Operador: ${operador!!.lexema}"))
+        }
+        if (expresionAritmetica!=null){
+            raiz.children.add(expresionAritmetica!!.getArbolVisual())
+        }
+        return raiz
     }
 
     override fun toString(): String {
