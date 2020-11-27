@@ -10,7 +10,7 @@ class ValorNumerico(var signo: Token?, var numero:Token) {
         if (signo!=null){
             raiz.children.add(TreeItem("Signo: ${signo!!.lexema}"))
         } else {
-            raiz.children.add(TreeItem("Signo: +"))
+            raiz.children.add(TreeItem("Signo: @+"))
         }
         raiz.children.add(TreeItem("Numero: ${numero.lexema}"))
         return raiz

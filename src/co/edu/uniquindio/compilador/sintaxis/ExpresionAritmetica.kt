@@ -31,7 +31,7 @@ class ExpresionAritmetica(): Expresion() {
     }
 
     override open fun getArbolVisual(): TreeItem<String>{
-        var raiz = TreeItem("Aritmetica")
+        var raiz = TreeItem("Expresion Aritmetica")
         if (expresionAritmetica1!=null){
             raiz.children.add(expresionAritmetica1!!.getArbolVisual())
         }

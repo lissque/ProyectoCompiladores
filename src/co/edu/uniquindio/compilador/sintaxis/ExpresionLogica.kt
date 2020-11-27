@@ -20,7 +20,7 @@ class ExpresionLogica(): Expresion() {
     }
 
     override open fun getArbolVisual(): TreeItem<String> {
-        var raiz = TreeItem("Logica")
+        var raiz = TreeItem("Expresion Logica")
         if (vl!=null){
             raiz.children.add(vl!!.getArbolVisual())
         }

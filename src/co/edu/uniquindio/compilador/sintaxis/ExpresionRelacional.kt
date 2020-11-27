@@ -30,7 +30,7 @@ class ExpresionRelacional(): Expresion() {
     }
 
     override open fun getArbolVisual(): TreeItem<String> {
-        var raiz = TreeItem("Relacional")
+        var raiz = TreeItem("Expresion Relacional")
         if (expresionRelacional1!=null){
             raiz.children.add(expresionRelacional1!!.getArbolVisual())
         }

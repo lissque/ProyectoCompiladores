@@ -6,7 +6,12 @@ import javafx.scene.control.TreeItem
 class Decremento(var nombreVariable: Token):Sentencia() {
 
     override open fun getArbolVisual():TreeItem<String>{
-        return TreeItem("Decremento: Variable: ${nombreVariable.lexema}")
+        var raiz=  TreeItem("Decremento")
+
+        if (nombreVariable!=null){
+            raiz.children.add(TreeItem("Identificador: ${nombreVariable.lexema}"))
+        }
+        return raiz
     }
 
     override fun toString(): String {

@@ -649,7 +649,7 @@ class AnalizadorLexico (var codigoFuente:String) {
             var filaIncial = filaActual
             var columnaInicial = columnaActual
             var posicionInicial = posicionActual
-            lexema += caracterActual
+            //lexema += caracterActual
             obtenerSiguienteCaracter()
 
             while (caracterActual != '_' && caracterActual != finCodigo){
@@ -657,7 +657,7 @@ class AnalizadorLexico (var codigoFuente:String) {
                 obtenerSiguienteCaracter()
             }
             if (caracterActual == '_'){
-                lexema += caracterActual
+                //lexema += caracterActual
                 almacenarToken(lexema, Categoria.CADENA, filaIncial, columnaInicial)
                 obtenerSiguienteCaracter()
                 return true

@@ -19,9 +19,12 @@ class ExpresionCadena(): Expresion() {
     }
 
     override open fun getArbolVisual():TreeItem<String>{
-        var raiz = TreeItem("Cadena")
-        if (cadena!=null&&mas!=null&&exp!=null){
-            raiz.children.add(TreeItem("Cadena: ${cadena!!.lexema} ${mas!!.lexema} Expresion: ${exp!!.getArbolVisual()}"))
+        var raiz = TreeItem("Expresion Cadena")
+        if (cadena!=null){
+            raiz.children.add(TreeItem("Cadena: ${cadena!!.lexema} "))
+        }
+        if (exp!=null){
+            raiz.children.add(exp!!.getArbolVisual())
         }
         return raiz
     }

@@ -10,7 +10,6 @@ class Parametro(var nombreParametro:Token, var tipoDeDato:Token) {
     }
 
     fun getArbolVisual(): TreeItem<String> {
-
         return TreeItem("${nombreParametro.lexema} : ${tipoDeDato.lexema}" )
     }
 }

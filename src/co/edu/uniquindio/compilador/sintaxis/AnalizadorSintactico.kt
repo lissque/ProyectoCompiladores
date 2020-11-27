@@ -121,13 +121,22 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                                     var listaSentencias = esListaSentencias()
 
                                     if (listaSentencias != null) {
-                                        obtenerSiguienteToken()
-
                                         if (tokenActual.categoria == Categoria.ADMIRACIONDER) {
+                                            obtenerSiguienteToken()
                                             return Funcion(nombreFuncion, tipoRetorno, listaParametros, listaSentencias)
                                         } else {
                                             reportarError("Falta signo de admiración derecho")
                                         }
+                                        /**
+                                         * Inicio;
+                                        mut vnum &x& :: 65 /
+                                        mut vcd &y& :: _ggg_/
+                                        fun &PRUEBA1& ¿ vnum &a& ^ vnum &b&? ; vnum ¡
+                                        mut vcd &hola& :: _ggg_/
+                                        &a&@++/
+                                        !
+                                        Fin
+                                         */
                                     } else {
                                         reportarError("La lista de sentencias esta vacia")
                                     }
@@ -165,6 +174,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         while (parametro != null) {
 
             listaParametros.add(parametro)
+            obtenerSiguienteToken()
 
             if (tokenActual.categoria == Categoria.SEPARADOR) {
                 obtenerSiguienteToken()
@@ -232,18 +242,18 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     /**
      * <Expresion> ::= <ExpresionLogica> | <ExpresionAritmetica> | <ExpresionRelacional> | <ExpresionCadena>
      *
-     * */
+     */
     fun esExpresion(): Expresion? {
 
         var expresion: Expresion? = esExpresionAritmetica()
         if (expresion != null) {
             return expresion
         }
-        expresion = esExpresionLogica()
+        expresion = esExpresionRelacional()
         if (expresion != null) {
             return expresion
         }
-        expresion = esExpresionRelacional()
+        expresion = esExpresionLogica()
         if (expresion != null) {
             return expresion
         }
@@ -290,7 +300,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             val valor = esValorNumerico()
             if (valor != null) {
 
-                obtenerSiguienteToken()
+                //obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.OPERADOR_ARITMETICO) {
                     val operador = tokenActual
 
@@ -348,7 +358,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             val valor = esExpresionAritmetica()
             if (valor != null) {
 
-                obtenerSiguienteToken()
+                //obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.OPERADOR_RELACIONAL) {
                     val operador = tokenActual
 
@@ -376,7 +386,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     fun esExpresionLogica(): ExpresionLogica? {
         var pos = posicionActual
         val vl = esExpresionRelacional()
-
         if (vl != null) {
 
             if (tokenActual.categoria == Categoria.OPERADOR_LOGICO && (tokenActual.lexema == "()" || tokenActual.lexema == "¬¬")) {
@@ -393,7 +402,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 if (expresionLogica != null) {
                     return ExpresionLogica(vl, operadorNegacion, expresionLogica)
                 }
-            } else {
+            }else{
                 return ExpresionLogica(vl)
             }
         }
@@ -431,7 +440,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     /**
      * <Decision> ::= si "¿" <ExpresionLogica> "?" "¡" <ListaSentencias> "!" [<DeLoContrario>]
      */
-
     private fun hacerBacktracking(posInicial: Int) {
         //posicionActual = posInicial
         //tokenActual = listaTokens[posicionActual]
@@ -450,18 +458,15 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
     fun esListaSentencias(): ArrayList<Sentencia>? {
         var listaSentencias = ArrayList<Sentencia>()
         var sentencia = esSentencia()
-
         while (sentencia != null) {
 
             listaSentencias.add(sentencia)
             obtenerSiguienteToken()
             sentencia = esSentencia()
         }
-
         if (listaSentencias.size > 0) {
             return listaSentencias
         }
-
         return null
     }
 
@@ -476,14 +481,16 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             return sentencia
         }
 
-        sentencia = esIncremento()
-        if (sentencia != null) {
-            return sentencia
-        }
         sentencia = esDeclaracionVariable()
         if (sentencia != null) {
             return sentencia
         }
+
+        sentencia = esInvocacionFuncion()
+        if (sentencia != null) {
+            return sentencia
+        }
+
         sentencia = esAsignacion()
         if (sentencia != null) {
             return sentencia
@@ -507,12 +514,14 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             return sentencia
         }
         //No funciona muy bien
-        sentencia = esInvocacionFuncion()
+
+
+        sentencia = esDecremento()
         if (sentencia != null) {
             return sentencia
         }
 
-        sentencia = esDecremento()
+        sentencia = esIncremento()
         if (sentencia != null) {
             return sentencia
         }
@@ -552,9 +561,11 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.ADMIRACIONIZQ) {
                             obtenerSiguienteToken()
+
                             var listaSentencias = esListaSentencias()
                             if (listaSentencias != null) {
 
+                                //hacerBacktracking(posicionActual-1)
                                 //obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.ADMIRACIONDER) {
                                     obtenerSiguienteToken()
@@ -609,7 +620,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                         obtenerSiguienteToken()
                         var expresion = esExpresion()
                         if (expresion != null) {
-                            obtenerSiguienteToken()
+                            //obtenerSiguienteToken()
                             if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA) {
                                 return DeclaracionVariable(tipoVariable, tipoDeDato, identificador, expresion)
                             }
@@ -651,7 +662,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 obtenerSiguienteToken()
                 var expresion = esExpresion()
                 if (expresion != null){
-                    obtenerSiguienteToken()
+                    //obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                         return Asignacion(identificador,expresion)
                     }else{
@@ -687,7 +698,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                             obtenerSiguienteToken()
                             var sentencias = esListaSentencias()
                             if (sentencias != null){
-                                obtenerSiguienteToken()
+                                //obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.ADMIRACIONDER){
                                     return CicloMientras(expresion, sentencias)
                                 }else{
@@ -723,7 +734,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                obtenerSiguienteToken()
+                //obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                     return Retorno(expresion)
                 }else{
@@ -747,7 +758,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                obtenerSiguienteToken()
+                //obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                     return Impresion(expresion)
                 }else{
@@ -771,7 +782,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             obtenerSiguienteToken()
             var expresion = esExpresion()
             if (expresion != null){
-                obtenerSiguienteToken()
+                //obtenerSiguienteToken()
                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                     return Lectura(expresion)
                 }else{
@@ -791,7 +802,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esInvocacionFuncion(): InvocacionFuncion?{
         var pos = posicionActual
-
         if (tokenActual.categoria == Categoria.IDENTIFICADOR){
             var identificadorVariable = tokenActual
             obtenerSiguienteToken()
@@ -804,11 +814,10 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                         obtenerSiguienteToken()
                         var argumentos = esListaArgumentos()
                         if(argumentos != null){
-                            obtenerSiguienteToken()
                             if(tokenActual.categoria == Categoria.INTERROGACIONDER){
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                    return InvocacionFuncion(identificadorVariable,identificadorVariable,argumentos)
+                                    return InvocacionFuncion(identificadorVariable,identificadorFuncion,argumentos)
                                 }else{
                                     reportarError("Falta fin de sentencia")
                                 }
@@ -819,7 +828,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                             if(tokenActual.categoria == Categoria.INTERROGACIONDER){
                                 obtenerSiguienteToken()
                                 if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
-                                    return InvocacionFuncion(identificadorVariable,identificadorVariable,argumentos)
+                                    return InvocacionFuncion(identificadorVariable,identificadorFuncion,argumentos)
                                 }else{
                                     reportarError("Falta fin de sentencia")
                                 }
@@ -828,14 +837,12 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                             }
                         }
                     }else{
-                        reportarError("Falta signo de interrogacion izquierdo")
+                        reportarError("Falta signo de interrogacion izquierdo!!")
                     }
                 }
             }else{
                 if(tokenActual.categoria == Categoria.INTERROGACIONIZQ){
-                    println("ANTES: "+tokenActual)
                     obtenerSiguienteToken()
-                    println("DESPUES: "+tokenActual)
                     var argumentos = esListaArgumentos()
                     if(argumentos != null){
                         obtenerSiguienteToken()
@@ -862,7 +869,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                         }
                     }
                 }else{
-                    reportarError("Falta signo de interrogacion izquierdo")
+                    reportarError("Falta signo de interrogacion izquierdo!!")
                 }
             }
         }
@@ -875,13 +882,15 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
      */
     fun esListaArgumentos(): ArrayList<Expresion>? {
 
-        var pos = posicionActual
         var listaArgumentos = ArrayList<Expresion>()
         var argumento = esArgumento()
         while (argumento != null) {
-
+            println("param"+tokenActual.lexema)
             listaArgumentos.add(argumento)
+            //obtenerSiguienteToken()
+
             if(tokenActual.categoria == Categoria.SEPARADOR){
+                obtenerSiguienteToken()
                 argumento = esArgumento()
             }else{
                 break
@@ -892,7 +901,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
             return listaArgumentos
         }
 
-        hacerBacktracking(pos)
         return null
     }
 
@@ -948,7 +956,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
         if (tokenActual.categoria == Categoria.IDENTIFICADOR){
             var nombreVariable = tokenActual
             obtenerSiguienteToken()
-
             if (tokenActual.categoria == Categoria.OPERADOR_INCREMENTO){
                 obtenerSiguienteToken()
 
@@ -958,7 +965,9 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                     reportarError("Falta fin de sentencia")
                 }
             }else{
-                reportarError("Falta operador de inremento")
+                hacerBacktracking(pos)
+                reportarError("Falta operador de incremento")
+                return null
             }
         }
         hacerBacktracking(pos)
@@ -983,6 +992,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                     reportarError("Falta fin de sentencia")
                 }
             }else{
+                hacerBacktracking(posicionActual-1)
                 reportarError("Falta operador de decremento")
             }
         }
@@ -1131,7 +1141,6 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                 obtenerSiguienteToken()
                 var sentencias = esListaSentencias()
                 if (sentencias != null){
-                    //obtenerSiguienteToken()
                     if (tokenActual.categoria == Categoria.ADMIRACIONDER){
                         obtenerSiguienteToken()
                         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA && tokenActual.lexema == "mientras"){
@@ -1143,6 +1152,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
                                     //obtenerSiguienteToken()
                                     if (tokenActual.categoria == Categoria.INTERROGACIONDER){
                                         obtenerSiguienteToken()
+                                        println("aqui"+tokenActual.lexema)
                                         if (tokenActual.categoria == Categoria.FIN_DE_SENTENCIA){
                                             return HacerMientras(sentencias,expresion)
                                         } else{

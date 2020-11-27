@@ -13,15 +13,28 @@ fun main()
     val retorno = "retornar 1@+2 /"
     val impresion = "imprimir 1@+2 /"
     val lectura = "leer 1@+2 /"
-    val invocacionFuncion = "&UNO& ¿ 1^2 ? /"
+    val invocacionFuncion = "&a& :: &UNO& ¿? /"
     val incremento = "&A&@++/"
     val decremento = "&A&@--/"
     val declaracionArreglo = "mut vnum &UMF& [ ] :: [1^2^48] /"
-    val hacerMientras = "hacer ¡ &a&@++/ ! mientras ¿ 1 >> 2?/"
+    val hacerMientras = "hacer¡ \n" +
+            "imprimir &a&/ \n" +
+            "retornar &23&/ \n" +
+            "!\n" +
+            "mientras¿67<<34?/"
     val lexico = AnalizadorLexico(hacerMientras)
     lexico.analizar()
 
     val sintaxis = AnalizadorSintactico(lexico.listaTokens)
-    print(sintaxis.esHacerMientras())
+    println(sintaxis.esHacerMientras())
     println(sintaxis.listaErrores)
 }
+
+/*
+Inicio ;
+
+fun &PRUEBA1& ¿ vnum &a& ? ; vnum ¡
+si ¿8()9? ¡ &A&@--/ !
+!
+Fin
+ */
