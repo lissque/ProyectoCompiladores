@@ -1,5 +1,7 @@
 package co.edu.uniquindio.compilador.sintaxis
 
+import co.edu.uniquindio.compilador.lexico.Error
+import co.edu.uniquindio.compilador.semantica.TablaSimbolos
 import javafx.scene.control.TreeItem
 
 class Decision(var expresionLogica: ExpresionLogica, var listaSentencia: ArrayList<Sentencia>?, var deLoContrario: DeLoContrario?): Sentencia() {
@@ -29,5 +31,27 @@ class Decision(var expresionLogica: ExpresionLogica, var listaSentencia: ArrayLi
 
     override fun toString(): String {
         return "Decision(expresionLogica=$expresionLogica, listaSentencia=$listaSentencia, deLoContrario=$deLoContrario)"
+    }
+
+    override fun llenarTablaSimbolos(tablaSimbolos: TablaSimbolos, listaErrores: ArrayList<Error>, ambito: String) {
+        for (s in listaSentencia!!){
+            s.llenarTablaSimbolos(tablaSimbolos,listaErrores,ambito)
+        }
+        if(deLoContrario!=null){
+            for (s in deLoContrario!!.listaSentencia!!){
+                s.llenarTablaSimbolos(tablaSimbolos,listaErrores,ambito)
+            }
+        }
+    }
+
+    override fun analizarSemantica(tablaSimbolos: TablaSimbolos, listaErrores: ArrayList<Error>, ambito: String) {
+        for (s in listaSentencia!!){
+            s.analizarSemantica(tablaSimbolos,listaErrores,ambito)
+        }
+        if(deLoContrario!=null){
+            for (s in deLoContrario!!.listaSentencia!!){
+                s.analizarSemantica(tablaSimbolos,listaErrores,ambito)
+            }
+        }
     }
 }

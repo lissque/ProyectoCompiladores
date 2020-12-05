@@ -6,6 +6,7 @@ import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 fun main()
 {
 
+
     val decision = "si ¿8()9? ¡&A&@--/! dlc ¡&A&@++/!"
     val declaracionVariable = "mut vcd &numero& :: 1@+2 /"
     val asignacion = "&numero& :: 1@+2 /"
@@ -30,11 +31,3 @@ fun main()
     println(sintaxis.listaErrores)
 }
 
-/*
-Inicio ;
-
-fun &PRUEBA1& ¿ vnum &a& ? ; vnum ¡
-si ¿8()9? ¡ &A&@--/ !
-!
-Fin
- */

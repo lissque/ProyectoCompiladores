@@ -80,6 +80,7 @@ class AnalizadorLexico (var codigoFuente:String) {
         listaPalabrasReservadas.add("noRetorno")
         listaPalabrasReservadas.add("fun")
         listaPalabrasReservadas.add("detener")
+        listaPalabrasReservadas.add("estado")
     }
 
     fun hacerBT(posicionInicial: Int, filaInicial: Int, columnaInicial: Int) {

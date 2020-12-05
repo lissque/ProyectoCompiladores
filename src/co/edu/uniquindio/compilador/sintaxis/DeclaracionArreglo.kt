@@ -1,6 +1,8 @@
 package co.edu.uniquindio.compilador.sintaxis
 
+import co.edu.uniquindio.compilador.lexico.Error
 import co.edu.uniquindio.compilador.lexico.Token
+import co.edu.uniquindio.compilador.semantica.TablaSimbolos
 import javafx.scene.control.TreeItem
 
 class DeclaracionArreglo(var tipoVariable: Token, var tipoDeDato: Token, var identificador: Token, var listaValoresNumericos: ArrayList<ValorNumerico>?):Sentencia() {
@@ -24,5 +26,16 @@ class DeclaracionArreglo(var tipoVariable: Token, var tipoDeDato: Token, var ide
 
     override fun toString(): String {
         return "DeclaracionArreglo(tipoVariable=$tipoVariable, tipoDeDato=$tipoDeDato, identificador=$identificador, listaValoresNumericos=$listaValoresNumericos)"
+    }
+
+    override fun llenarTablaSimbolos(tablaSimbolos: TablaSimbolos, listaErrores: ArrayList<Error>, ambito: String) {
+
+        tablaSimbolos.guardarSimboloVariable(identificador.lexema,tipoDeDato.lexema,true,ambito,identificador.fila,identificador.columna)
+    }
+
+    override fun analizarSemantica(tablaSimbolos: TablaSimbolos, listaErrores: ArrayList<Error>, ambito: String) {
+        for (e in listaValoresNumericos!! ){
+
+        }
     }
 }

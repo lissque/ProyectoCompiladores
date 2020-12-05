@@ -2,10 +2,13 @@ package co.edu.uniquindio.compilador.controladores
 
 import co.edu.uniquindio.compilador.lexico.AnalizadorLexico
 import co.edu.uniquindio.compilador.lexico.Categoria
+import co.edu.uniquindio.compilador.lexico.Error
 import co.edu.uniquindio.compilador.lexico.Token
 import co.edu.uniquindio.compilador.observable.ErrorObservable
+import co.edu.uniquindio.compilador.observable.ErrorSemanticoObservable
 import co.edu.uniquindio.compilador.observable.ErrorSintacticoObservable
 import co.edu.uniquindio.compilador.observable.TokenObservable
+import co.edu.uniquindio.compilador.semantica.AnalizadorSemantico
 import co.edu.uniquindio.compilador.sintaxis.AnalizadorSintactico
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -50,6 +53,15 @@ class InicioController {
     lateinit var columnaColumna: TableColumn<ErrorSintacticoObservable, String>
 
     @FXML
+    lateinit var tablaErrorSemantico: TableView<ErrorSemanticoObservable>
+    @FXML
+    lateinit var mensaje: TableColumn<ErrorSemanticoObservable, String>
+    @FXML
+    lateinit var filaSemantica: TableColumn<ErrorSemanticoObservable, String>
+    @FXML
+    lateinit var columnaSemantica: TableColumn<ErrorSemanticoObservable, String>
+
+    @FXML
     lateinit var arbolVisual : TreeView<String>
 
     @FXML
@@ -58,6 +70,7 @@ class InicioController {
             iniciarTablaTokens()
             iniciarTablaErrores()
             iniciarTablaErroresSintacticos()
+            iniciarTablaErroresSemanticos()
             val lexico = AnalizadorLexico(codigoFuente.text)
             lexico.analizar()
             llenarTabla(lexico)
@@ -69,6 +82,13 @@ class InicioController {
                 llenarTablaErrorSintactico(sintaxis)
                 if (uc != null) {
                     arbolVisual.root = uc.getArbolVisual()
+
+                    val semantica=AnalizadorSemantico(uc!!)
+                    semantica.llenarTablaSimbolos()
+                    print(semantica.tablaSimbolos)
+                    semantica.analizarSemantica()
+                    llenarTablaErrorSemantico(semantica)
+                    print(semantica.listaErrores)
                 }
             }
             else {
@@ -99,6 +119,12 @@ class InicioController {
         columnaColumna.cellValueFactory = PropertyValueFactory<ErrorSintacticoObservable,String>("columna")
     }
 
+    private fun iniciarTablaErroresSemanticos(){
+        mensaje.cellValueFactory = PropertyValueFactory<ErrorSemanticoObservable,String>("mensaje")
+        filaSemantica.cellValueFactory = PropertyValueFactory<ErrorSemanticoObservable,String>("fila")
+        columnaSemantica.cellValueFactory = PropertyValueFactory<ErrorSemanticoObservable,String>("columna")
+    }
+
     private fun llenarTabla(lexico : AnalizadorLexico){
         tablaTokens.items.clear()
         for (elemento in lexico.listaTokens){
@@ -121,5 +147,13 @@ class InicioController {
             tablaErrorSintactico.items.add(ErrorSintacticoObservable(elemento.error,"".plus(elemento.fila),"".plus(elemento.columna.toString())))
         }
         tablaTokens.refresh()
+    }
+
+    private fun llenarTablaErrorSemantico(semantico: AnalizadorSemantico){
+        tablaErrorSemantico.items.clear()
+        for (elemento in semantico.listaErrores){
+            tablaErrorSemantico.items.add(ErrorSemanticoObservable(elemento.error,"".plus(elemento.fila),"".plus(elemento.columna.toString())))
+        }
+        tablaErrorSemantico.refresh()
     }
 }

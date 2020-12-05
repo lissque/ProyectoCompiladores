@@ -216,7 +216,7 @@ class AnalizadorSintactico(var listaTokens:ArrayList<Token>) {
 
         if (tokenActual.categoria == Categoria.PALABRA_RESERVADA) {
 
-            if (tokenActual.lexema == "vnum" || tokenActual.lexema == "vcd" || tokenActual.lexema == "v") {
+            if (tokenActual.lexema == "vnum" || tokenActual.lexema == "vcd" || tokenActual.lexema == "v" || tokenActual.lexema=="estado") {
                 return tokenActual
             }
         }
